@@ -52,7 +52,7 @@ class Hostname:
         # simple nor human readable. So best to use separate
         # checks
 
-        if not re.match(r"^[a-z\d-]$", s):
+        if not re.match(r"^[a-z\d-]*$", s):
             return False
 
         if s[0] == "-" or s[-1] == "-":
