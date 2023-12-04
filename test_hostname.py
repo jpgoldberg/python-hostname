@@ -13,7 +13,7 @@ class TestHostname(unittest.TestCase):
         ("-initial.hyphen.example", False, "leading hyphen")
     ]
 
-    def test_is_hostname(self):
+    def test_is_hostname(self) -> None:
         for (data, expected, desc) in self.test_strings:
             with self.subTest(msg=desc):
                 result = hostname.Hostname.is_hostname(data)
