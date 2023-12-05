@@ -1,4 +1,5 @@
-from typing import TypeGuard, Any, Self
+from typing import Any, Self, TypeGuard
+
 import dns.name
 
 
@@ -14,7 +15,7 @@ class Hostname:
 
     @classmethod
     def is_hostname(cls, s: Any) -> TypeGuard[Self]:
-        if not isinstance(s, (str, bytes)):
+        if not isinstance(s, str | bytes):
             return False
 
         # checks DNS requirements and converts to punycode if needed.
@@ -32,7 +33,7 @@ class Hostname:
             return False
 
         # A faster implementation would be to inline this
-        if not all([cls._is_label(label) for label in labels]):
+        if not all(cls._is_label(label) for label in labels):
             return False
 
         # Last (most significant) label cannot be all digits
@@ -77,6 +78,6 @@ class Hostname:
             ):
                 return False
             # Starting or ending with "-" is also forbidden.
-        if label[0] == cls._HYPHEN or label[-1] == cls._HYPHEN:
+        if cls._HYPHEN in (label[0], label[-1]):
             return False
         return True

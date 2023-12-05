@@ -1,13 +1,13 @@
 import unittest
-from typing import TypeAlias
+from typing import ClassVar, TypeAlias
 
-import hostname
+from src.hostname import hostname
 
 
 class TestHostname(unittest.TestCase):
     TestString: TypeAlias = tuple[str, bool, str]
 
-    test_strings: list[TestString] = [
+    test_strings: ClassVar[list[TestString]] = [
         ("a.good.example", True, "simple"),
         ("-initial.hyphen.example", False, "leading hyphen"),
     ]
