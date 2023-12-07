@@ -16,6 +16,7 @@ class TestHostname(unittest.TestCase):
         ("last.digits.123", False, "last label digits"),
         ("under_score.in.host", False, "Controversial: no underscore at all"),
         ("underscore.in.net_work", False, "not allowed in network names"),
+        ("3com.net", True, "Initial digit"),
     ]
 
     def test_is_hostname(self) -> None:
