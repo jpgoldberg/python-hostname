@@ -9,5 +9,5 @@ jobs:
     steps:
       - uses: jpetrucciani/mypy-check@master
         with:
-          requirements_file: "requirements.txt"
+          requirements_file: "src/requirements.txt"
           python_version: "3.11"
