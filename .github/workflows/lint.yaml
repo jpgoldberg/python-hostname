@@ -11,3 +11,4 @@ jobs:
         with:
           requirements_file: "src/requirements.txt"
           python_version: "3.11"
+          mypy_flags: '--config-file ./mypy.ini'
