@@ -1,0 +1,15 @@
+name: lint
+run-name: ${{ github.actor }} is linting
+on:
+  push:
+    branches:
+      - main
+jobs:
+  type-checking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jpetrucciani/mypy-check@master
+        with:
+          requirements_file: "requirements.txt"
+          python_version: "3.11"
+          mypy_flags: '--config-file mypy.ini'
