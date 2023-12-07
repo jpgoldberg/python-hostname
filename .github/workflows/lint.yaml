@@ -10,5 +10,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: jpetrucciani/mypy-check@master
         with:
-          requirements_file: "src/requirements.txt"
+          requirements_file: "requirements.txt"
           python_version: "3.11"
