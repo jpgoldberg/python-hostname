@@ -1,12 +1,6 @@
 name: lint
 run-name: ${{ github.actor }} is linting
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "mypi.ini"
-      - "**.py"
   workflow_dispatch:
 
 jobs:
