@@ -12,3 +12,4 @@ jobs:
         with:
           requirements_file: "requirements.txt"
           python_version: "3.11"
+          path: ''
