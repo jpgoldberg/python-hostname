@@ -7,6 +7,8 @@ on:
     paths:
       - "mypi.ini"
       - "src/**.py"
+  workflow_dispatch:
+
 jobs:
   type-checking:
     runs-on: ubuntu-latest
