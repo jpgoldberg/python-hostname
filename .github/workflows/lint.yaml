@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "mypi.ini"
+      - "src/**.py"
 jobs:
   type-checking:
     runs-on: ubuntu-latest
