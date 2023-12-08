@@ -4,7 +4,9 @@ Much to my surprise, or perhaps simply failure to search properly,
 there is no RFC compliant python tool for that syntactically validates hostnames.
 Note that not all valid domain names are valid hostnames.
 
-To validated domain names, I recommend dnspython, and to validate Urls, I recommend pydantic. But neither offers direct validation of hostnames.
+To validated domain names, I recommend [dnspython](https://www.dnspython.org), and to validate Urls
+I recommend [Pydantic](https://docs.pydantic.dev/latest/).
+But neither offers direct validation of hostnames.
 
 ## "Host" v "hostname"
 
