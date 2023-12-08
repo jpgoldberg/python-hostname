@@ -2,6 +2,10 @@ name: lint
 run-name: ${{ github.actor }} is linting
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '**.py'
+      - 'mypy.ini'
 
 jobs:
   type-checking:
