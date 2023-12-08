@@ -21,6 +21,16 @@ jobs:
           requirements_file: "requirements.txt"
           python_version: "3.11"
           path: ''
+      - name: Create mypy badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.SECRET_GIST_TOKEN }}
+          gistID: a33d7cc45aaab6987945bc3a037c1f88
+          filename: mypy-badge.json
+          label: Mypy
+          message: checked
+          color: blue
+
 
   ruff-linting:
     runs-on: ubuntu-latest
