@@ -6,6 +6,8 @@ on:
     paths:
       - '**.py'
       - 'mypy.ini'
+      - 'ruff.toml'
+      - "pyproject.toml"
 
 jobs:
   type-checking:
@@ -17,3 +19,4 @@ jobs:
           requirements_file: "requirements.txt"
           python_version: "3.11"
           path: ''
+      - uses: jpetrucciani/ruff-check@main
