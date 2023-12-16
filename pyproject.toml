@@ -140,7 +140,7 @@ omit = [
 ]
 
 [tool.coverage.paths]
-hostname = ["src/hostname", "*/hostname/src/hostname"]
+source = ["src/hostname", "src", ]
 tests = ["tests", "*/hostname/tests"]
 
 [tool.coverage.report]
