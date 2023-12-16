@@ -20,7 +20,7 @@ jobs:
         with:
           requirements_file: "requirements.txt"
           python_version: "3.11"
-          path: ''
+          path: '.'
       - name: Create mypy badge
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
