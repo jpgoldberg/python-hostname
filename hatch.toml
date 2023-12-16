@@ -1,0 +1,59 @@
+[build]
+
+[build.targets.sdist]
+exclude = [
+  "/.github",
+  "/.pre-commit-config.yaml",
+  "/.vscode",
+  "/docs",
+]
+
+
+[version]
+path = "hostname/__about__.py"
+
+[envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+]
+[envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[envs.all.matrix]]
+python = ["3.11", "3.12"]
+
+[envs.lint]
+detached = true
+dependencies = [
+  "black>=23.1.0",
+  "mypy>=1.4.0",
+  "ruff>=0.0.243",
+  "dnspython",
+  "idna",
+]
+
+[envs.lint.scripts]
+typing = "mypy --install-types --non-interactive ."
+style = [
+  "ruff {args:.}",
+  "black --check --diff {args:.}",
+]
+fmt = [
+  "black {args:.}",
+  "ruff --fix {args:.}",
+  "style",
+]
+all = [
+  "style",
+  "typing",
+]
