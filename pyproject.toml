@@ -23,7 +23,7 @@ Repository = "https://github.com/jpgoldberg/python-hostname"
 [tool]
 
 [tool.hatch.version]
-path = "src/hostname/__about__.py"
+path = "hostname/__about__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -56,7 +56,7 @@ dependencies = [
 ]
 
 [tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive src/"
+typing = "mypy --install-types --non-interactive ."
 style = [
   "ruff {args:.}",
   "black --check --diff {args:.}",
@@ -136,11 +136,12 @@ source_pkgs = ["hostname", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/hostname/__about__.py",
+  "hostname/__about__.py",
 ]
 
 [tool.coverage.paths]
-source = ["src/hostname", "src", ]
+source = ["src/*"]
+include =['src/hostname/*.py']
 tests = ["tests", "*/hostname/tests"]
 
 [tool.coverage.report]

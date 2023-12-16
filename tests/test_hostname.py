@@ -1,7 +1,7 @@
 import unittest
 from typing import ClassVar, TypeAlias
 
-from src.hostname import hostname
+from hostname import hostname
 
 
 class TestHostname(unittest.TestCase):
