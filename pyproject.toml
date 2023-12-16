@@ -136,13 +136,8 @@ source_pkgs = ["hostname", "tests"]
 branch = true
 parallel = true
 omit = [
-  "hostname/__about__.py",
+  "*/__about__.py",
 ]
-
-[tool.coverage.paths]
-source = ["src/*"]
-include =['src/hostname/*.py']
-tests = ["tests", "*/hostname/tests"]
 
 [tool.coverage.report]
 exclude_lines = [
