@@ -12,9 +12,24 @@ class Hostname:
     _DIGIT_0 = ord("0")
     _DIGIT_9 = ord("9")
     _HYPHEN = ord("-")
+    _UNDERSCORE = ord("_")
+    _NO_SUCH_BYTE = -1
 
     @classmethod
-    def is_hostname(cls, s: Any) -> TypeGuard[Self]:
+    def is_hostname(cls, s: Any, allow_underscore: bool = False) -> TypeGuard[Self]:
+        """retruns True iff s is a standards complient Internet hostname.
+
+        Returns True when s is a valid hostname following RFCs defining
+        hostnames, domain names, and IDNA.
+
+        *allow_underscore* is a ``bool``. If true underscores are
+        allowed in in the first label.
+        This is non-standard behavior.
+        The default is False.
+        Use the default (False) unless you have a compelling reason to
+        perpetuate non-standard behavior and run the risk of
+        security problems many years from now.
+        """
         if not isinstance(s, str | bytes):
             return False
 
@@ -32,9 +47,12 @@ class Hostname:
         if len(labels) == 0:
             return False
 
-        # A faster implementation would be to inline this
-        if not all(cls._is_label(label) for label in labels):
-            return False
+        for i, label in enumerate(labels, 1):
+            if i != 1:
+                # if allowed, only in first label
+                allow_underscore = False
+            if cls._is_label(label, allow_underscore) is False:
+                return False
 
         # Last (most significant) label cannot be all digits
         if all(c >= cls._DIGIT_0 and c <= cls._DIGIT_9 for c in labels[-1]):
@@ -43,7 +61,7 @@ class Hostname:
         return True
 
     @classmethod
-    def _is_label(cls, label: bytes) -> bool:
+    def _is_label(cls, label: bytes, allow_underscore: bool = False) -> bool:
         """For a valid dns label, s, is valid hostname label"""
 
         # Valid dns labels are already ASCII and meet length
@@ -69,12 +87,17 @@ class Hostname:
         if len(label) == 0:
             return False
 
+        # underHack will be the ord value for the underscore when that is
+        # allowed or an int that will never be a byte.
+        underHack = cls._UNDERSCORE if allow_underscore else cls._NO_SUCH_BYTE
+
         for c in label:
             if not (
                 (c >= cls._LOWER_A and c <= cls._LOWER_Z)
                 or (c >= cls._UPPER_A and c <= cls._UPPER_Z)
                 or (c >= cls._DIGIT_0 and c <= cls._DIGIT_9)
                 or c == cls._HYPHEN
+                or c == underHack
             ):
                 return False
             # Starting or ending with "-" is also forbidden.
