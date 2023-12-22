@@ -1,6 +1,20 @@
 from typing import Any, Self, TypeGuard
+from enum import Flag, auto
 
 import dns.name
+import dns.exception
+
+
+class HostnameFlag(Flag):
+    """Flags for deviating from default hostname validation.
+
+    *ALL_UNDERSCORE* allows an underscore in the leftmost label.
+
+    *DENY_IDNA* Candidate hostname must be 7 bit ASCII.
+    """
+
+    ALLOW_UNDERSCORE = auto()
+    DENY_IDNA = auto()
 
 
 class Hostname:
@@ -16,20 +30,18 @@ class Hostname:
     _NO_SUCH_BYTE = -1
 
     @classmethod
-    def is_hostname(cls, s: Any, allow_underscore: bool = False) -> TypeGuard[Self]:
+    def is_hostname(cls, s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Self]:
         """retruns True iff s is a standards complient Internet hostname.
 
-        Returns True when s is a valid hostname following RFCs defining
-        hostnames, domain names, and IDNA.
+        Returns True when s is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
 
-        *allow_underscore* is a ``bool``. If true underscores are
-        allowed in in the first label.
-        This is non-standard behavior.
-        The default is False.
-        Use the default (False) unless you have a compelling reason to
-        perpetuate non-standard behavior and run the risk of
-        security problems many years from now.
+        *flags*
+          *HostnameFlags.ALLOW_UNDERSCORE* allows an underscore in the the first label. This is non-standard behavior. Use the default (False) unless you have a compelling reason to perpetuate non-standard behavior and run the risk of security problems many years from now.
         """
+
+        if flags is None:
+            flags = HostnameFlag(0)
+
         if not isinstance(s, str | bytes):
             return False
 
@@ -47,12 +59,11 @@ class Hostname:
         if len(labels) == 0:
             return False
 
-        for i, label in enumerate(labels, 1):
-            if i != 1:
-                # if allowed, only in first label
-                allow_underscore = False
-            if cls._is_label(label, allow_underscore) is False:
+        for label in labels:
+            if cls._is_label(label, flags) is False:
                 return False
+            # only allowed in first label
+            flags = flags & ~HostnameFlag.ALLOW_UNDERSCORE
 
         # Last (most significant) label cannot be all digits
         if all(c >= cls._DIGIT_0 and c <= cls._DIGIT_9 for c in labels[-1]):
@@ -61,7 +72,7 @@ class Hostname:
         return True
 
     @classmethod
-    def _is_label(cls, label: bytes, allow_underscore: bool = False) -> bool:
+    def _is_label(cls, label: bytes, restrictions: HostnameFlag) -> bool:
         """For a valid dns label, s, is valid hostname label"""
 
         # Valid dns labels are already ASCII and meet length
@@ -89,7 +100,10 @@ class Hostname:
 
         # underHack will be the ord value for the underscore when that is
         # allowed or an int that will never be a byte.
-        underHack = cls._UNDERSCORE if allow_underscore else cls._NO_SUCH_BYTE
+        if HostnameFlag.ALLOW_UNDERSCORE in restrictions:
+            underHack = cls._UNDERSCORE
+        else:
+            underHack = cls._NO_SUCH_BYTE
 
         for c in label:
             if not (

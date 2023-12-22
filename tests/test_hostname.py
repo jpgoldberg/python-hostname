@@ -1,7 +1,7 @@
 import unittest
 from typing import ClassVar, TypeAlias
 
-from hostname import hostname
+import hostname.hostname as hn
 
 
 class TestHostname(unittest.TestCase):
@@ -22,7 +22,7 @@ class TestHostname(unittest.TestCase):
     def test_is_hostname(self) -> None:
         for data, expected, desc in self.test_strings:
             with self.subTest(msg=desc):
-                result = hostname.Hostname.is_hostname(data)
+                result = hn.Hostname.is_hostname(data)
                 self.assertEqual(result, expected)
 
 
@@ -44,7 +44,7 @@ class TestHostnameUnderscore(unittest.TestCase):
     def test_is_hostname(self) -> None:
         for data, expected, desc in self.test_strings:
             with self.subTest(msg=desc):
-                result = hostname.Hostname.is_hostname(data, allow_underscore=True)
+                result = hn.Hostname.is_hostname(data, hn.HostnameFlag.ALLOW_UNDERSCORE)
                 self.assertEqual(result, expected)
 
 
