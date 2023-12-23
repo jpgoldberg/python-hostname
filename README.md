@@ -77,16 +77,39 @@ This allowed hostnames such as `3Com.net`.[^3]
 
 [^3]: 3Com was a a leading network technology company at the time that these standards were developed.
 
-### IDNA
-
-To do
-
-[RFC-5890] and friends radically change what counts as an allowable letter.
-
 ### Underscore
+
+The standards do not allow the underscore character, "`_`", to appear in a hostname.
+However some Internet software doesn't enforce that, and there was a time when some systems created such names in the most local (leftmost) part of a hostname.
+
+As I recall, Microsoft's Windows 95 operating system produced hostnames with underscores.
+Locally machines names could have names like "`Alices Computer`".
+When Windows 95 needed to present that to the Internet as a hostname label,
+it would convert it to "`alices_computer`".
+This was certainly the case when constructed the SMTP `HELO` message,
+which required the client's hostname.
+
+Sendmail, the overwhelmingly dominant mail transport agent at the time,
+allowed hostnames with underscores.
+Sendmail's acceptance of invalid hostnames  had probably been programming oversight at the time instead of a deliberate decision.
+The combination of
+a large number hosts sending invalid hostnames to major parts of Internet infrastructure
+which in turn accepted those invalid hostname
+led to such malformed hostnames being widely accepted.
+There almost certainly is more to the story than I was aware of or recall,
+but hostnames with underscores became widely accepted.
+
+By default `is_hostname()` rejects candidate hostnames with underscores.
+There is a flag, `HostnameFlags.ALLOW_UNDERSCORE` that enables underscores in
+the leftmost label only.
+My recommendation is to only set the flag if you have a compelling reason to.
+Syntactically invalid hostnames should be discouraged.
+
+### IDNA
 
 To Do
 
+[RFC-5890] and friends radically change what counts as an allowable letter.
 
 ----
 
