@@ -85,7 +85,7 @@ class Hostname:
         """
 
         try:
-            cls.validate(cls, s, flags)
+            cls.validate(s, flags)
         except Exception:
             return False
         return True
