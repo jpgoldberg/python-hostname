@@ -1,7 +1,7 @@
 from typing import Any, Self, TypeGuard
 from enum import Flag, auto
 
-import exception
+import hostname.exception as exc
 
 import dns.name
 import dns.exception
@@ -51,7 +51,7 @@ class Hostname:
         try:
             dname: dns.name.Name = dns.name.from_text(s).canonicalize()
         except Exception as e:
-            raise exception.DomainNameException(dns_exception=e) from e
+            raise exc.DomainNameException(dns_exception=e) from e
 
         labels: tuple[bytes, ...] = dname.labels
 
@@ -60,7 +60,7 @@ class Hostname:
 
         # Reject empty hostname
         if len(labels) == 0:
-            raise exception.NoLabelError
+            raise exc.NoLabelError
 
         for label in labels:
             cls._validate_label(label, flags)  # will raise exceptions on failure
@@ -70,7 +70,7 @@ class Hostname:
 
         # Last (most significant) label cannot be all digits
         if all(c >= cls._DIGIT_0 and c <= cls._DIGIT_9 for c in labels[-1]):
-            raise exception.DigitOnlyError
+            raise exc.DigitOnlyError
 
         return dname.to_text()
 
@@ -133,11 +133,11 @@ class Hostname:
                 or c == underHack
             ):
                 if c == cls._UNDERSCORE:
-                    raise exception.UnderscoreError
+                    raise exc.UnderscoreError
                 else:
-                    raise exception.InvalidCharacter
+                    raise exc.InvalidCharacter
             # Starting or ending with "-" is also forbidden.
 
         if cls._HYPHEN in (label[0], label[-1]):
-            raise exception.BadHyphenError
+            raise exc.BadHyphenError
         return True
