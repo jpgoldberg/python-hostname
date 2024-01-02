@@ -1,6 +1,8 @@
 from typing import Any, Self, TypeGuard
 from enum import Flag, auto
 
+import exception
+
 import dns.name
 import dns.exception
 
@@ -30,10 +32,10 @@ class Hostname:
     _NO_SUCH_BYTE = -1
 
     @classmethod
-    def is_hostname(cls, s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Self]:
-        """retruns True iff s is a standards complient Internet hostname.
+    def validate(cls, s: Any, flags: HostnameFlag | None = None) -> str:
+        """retruns a canonical form of the hostname if s is valid.
 
-        Returns True when s is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
+        If validation fails, this raises a HostnameException with some details of why it failed
 
         *flags*
           *HostnameFlags.ALLOW_UNDERSCORE* allows an underscore in the the first label. This is non-standard behavior. Use the default (False) unless you have a compelling reason to perpetuate non-standard behavior and run the risk of security problems many years from now.
@@ -43,13 +45,14 @@ class Hostname:
             flags = HostnameFlag(0)
 
         if not isinstance(s, str | bytes):
-            return False
+            raise ValueError("Expected str input")
 
         # checks DNS requirements and converts to punycode if needed.
         try:
             dname: dns.name.Name = dns.name.from_text(s).canonicalize()
-        except Exception:
-            return False
+        except Exception as e:
+            raise exception.DomainNameException(dns_exception=e) from e
+
         labels: tuple[bytes, ...] = dname.labels
 
         # remove root (most significant) label
@@ -57,23 +60,42 @@ class Hostname:
 
         # Reject empty hostname
         if len(labels) == 0:
-            return False
+            raise exception.NoLabelError
 
         for label in labels:
-            if cls._is_label(label, flags) is False:
-                return False
+            cls._validate_label(label, flags)  # will raise exceptions on failure
+
             # only allowed in first label
             flags = flags & ~HostnameFlag.ALLOW_UNDERSCORE
 
         # Last (most significant) label cannot be all digits
         if all(c >= cls._DIGIT_0 and c <= cls._DIGIT_9 for c in labels[-1]):
-            return False
+            raise exception.DigitOnlyError
 
+        return dname.to_text()
+
+    @classmethod
+    def is_hostname(cls, s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Self]:
+        """retruns True iff s is a standards complient Internet hostname.
+
+        Returns True when s is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
+
+        *flags*
+          *HostnameFlags.ALLOW_UNDERSCORE* allows an underscore in the the first label. This is non-standard behavior. Use the default (False) unless you have a compelling reason to perpetuate non-standard behavior and run the risk of security problems many years from now.
+        """
+
+        try:
+            cls.validate(cls, s, flags)
+        except Exception:
+            return False
         return True
 
     @classmethod
-    def _is_label(cls, label: bytes, restrictions: HostnameFlag) -> bool:
-        """For a valid dns label, s, is valid hostname label"""
+    def _validate_label(cls, label: bytes, restrictions: HostnameFlag) -> bool:
+        """For a valid dns label, s, is valid hostname label.
+
+        Raises exeptions of various failures
+        """
 
         # Valid dns labels are already ASCII and meet length
         # requirements.
@@ -95,9 +117,6 @@ class Hostname:
         # way unless you have already checked that you are using
         # 7-bit ASCII.
 
-        if len(label) == 0:
-            return False
-
         # underHack will be the ord value for the underscore when that is
         # allowed or an int that will never be a byte.
         if HostnameFlag.ALLOW_UNDERSCORE in restrictions:
@@ -113,8 +132,12 @@ class Hostname:
                 or c == cls._HYPHEN
                 or c == underHack
             ):
-                return False
+                if c == cls._UNDERSCORE:
+                    raise exception.UnderscoreError
+                else:
+                    raise exception.InvalidCharacter
             # Starting or ending with "-" is also forbidden.
+
         if cls._HYPHEN in (label[0], label[-1]):
-            return False
+            raise exception.BadHyphenError
         return True

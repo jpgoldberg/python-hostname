@@ -23,6 +23,14 @@ class DigitOnlyError(HostnameException):
     """The rightmost label is contains only digits"""
 
 
+class NoLabelError(HostnameException):
+    """Hostnames must have at least 1 label"""
+
+
+class BadHyphenError(HostnameException):
+    """A hyphen is used at the beginning or end of a label"""
+
+
 # Looking at how dnspython handles INDA exceptions and doing
 # that here wrt to DNS errors
 class DomainNameException(HostnameException):
