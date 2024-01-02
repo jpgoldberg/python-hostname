@@ -1,26 +1,27 @@
 import unittest
-from typing import ClassVar, TypeAlias
+from typing import ClassVar, TypeAlias, Optional
 
 import hostname.hostname as hn
+import hostname.exception as exc
 
 
 class TestHostname(unittest.TestCase):
-    TestString: TypeAlias = tuple[str, bool, str]
+    TestString: TypeAlias = tuple[str, bool, str, Optional[exc.HostnameException]]
 
     test_strings: ClassVar[list[TestString]] = [
-        ("a.good.example", True, "simple"),
-        ("-initial.hyphen.example", False, "leading hyphen"),
-        ("szárba.szökik.hu", True, "idna"),
-        ("no..empty.labels", False, "empty label"),
-        ("123.456.78a", True, "digit labels ok"),
-        ("last.digits.123", False, "last label digits"),
-        ("under_score.in.host", False, "Controversial: no underscore at all"),
-        ("underscore.in.net_work", False, "not allowed in network names"),
-        ("3com.net", True, "Initial digit"),
-    ]
+        ("a.good.example", True, "simple", None),
+        ("-initial.hyphen.example", False, "leading hyphen", exc.BadHyphenError),
+        ("szárba.szökik.hu", True, "idna", None),
+        ("no..empty.labels", False, "empty label", exc.DomainNameException),
+        ("123.456.78a", True, "digit labels ok", None),
+        ("last.digits.123", False, "last label digits", exc.DigitOnlyError),
+        ("under_score.in.host", False, "Controversial: no underscore at all", exc.UnderscoreError),
+        ("underscore.in.net_work", False, "not allowed in network names", exc.UnderscoreError),
+        ("3com.net", True, "Initial digit", None),
+    ]  # type: ignore
 
     def test_is_hostname(self) -> None:
-        for data, expected, desc in self.test_strings:
+        for data, expected, desc, _ in self.test_strings:
             with self.subTest(msg=desc):
                 result = hn.Hostname.is_hostname(data)
                 self.assertEqual(result, expected)
@@ -46,6 +47,28 @@ class TestHostnameUnderscore(unittest.TestCase):
             with self.subTest(msg=desc):
                 result = hn.Hostname.is_hostname(data, hn.HostnameFlag.ALLOW_UNDERSCORE)
                 self.assertEqual(result, expected)
+
+
+class TestExceptions(unittest.TestCase):
+    TestString: TypeAlias = tuple[str, bool, str, Optional[exc.HostnameException]]
+
+    test_strings: ClassVar[list[TestString]] = [
+        ("a.good.example", True, "simple", None),
+        ("-initial.hyphen.example", False, "leading hyphen", exc.BadHyphenError),
+        ("szárba.szökik.hu", True, "idna", None),
+        ("no..empty.labels", False, "empty label", exc.DomainNameException),
+        ("123.456.78a", True, "digit labels ok", None),
+        ("last.digits.123", False, "last label digits", exc.DigitOnlyError),
+        ("under_score.in.host", False, "Controversial: no underscore at all", exc.UnderscoreError),
+        ("underscore.in.net_work", False, "not allowed in network names", exc.UnderscoreError),
+        ("3com.net", True, "Initial digit", None),
+    ]  # type: ignore
+
+    def test_validate(self) -> None:
+        for data, _, desc, exception in self.test_strings:
+            if exception is not None:
+                with self.subTest(msg=desc):
+                    self.assertRaises(exception, hn.Hostname.validate, data)
 
 
 if __name__ == "__main__":
