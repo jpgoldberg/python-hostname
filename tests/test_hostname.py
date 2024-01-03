@@ -1,12 +1,14 @@
 import unittest
-from typing import ClassVar, TypeAlias, Optional
+from typing import ClassVar, TypeAlias, Union, Type, Tuple
 
 import hostname.hostname as hn
 import hostname.exception as exc
 
+ExcptionType = Union[None, Type[Exception], Tuple[Type[Exception], ...]]
+
 
 class TestHostname(unittest.TestCase):
-    TestString: TypeAlias = tuple[str, bool, str, Optional[exc.HostnameException]]
+    TestString: TypeAlias = tuple[str, bool, str, ExcptionType]
 
     test_strings: ClassVar[list[TestString]] = [
         ("a.good.example", True, "simple", None),
@@ -18,7 +20,7 @@ class TestHostname(unittest.TestCase):
         ("under_score.in.host", False, "Controversial: no underscore at all", exc.UnderscoreError),
         ("underscore.in.net_work", False, "not allowed in network names", exc.UnderscoreError),
         ("3com.net", True, "Initial digit", None),
-    ]  # type: ignore
+    ]
 
     def test_is_hostname(self) -> None:
         for data, expected, desc, _ in self.test_strings:
@@ -50,7 +52,7 @@ class TestHostnameUnderscore(unittest.TestCase):
 
 
 class TestExceptions(unittest.TestCase):
-    TestString: TypeAlias = tuple[str, bool, str, Optional[exc.HostnameException]]
+    TestString: TypeAlias = tuple[str, bool, str, ExcptionType]
 
     test_strings: ClassVar[list[TestString]] = [
         ("a.good.example", True, "simple", None),
@@ -62,7 +64,7 @@ class TestExceptions(unittest.TestCase):
         ("under_score.in.host", False, "Controversial: no underscore at all", exc.UnderscoreError),
         ("underscore.in.net_work", False, "not allowed in network names", exc.UnderscoreError),
         ("3com.net", True, "Initial digit", None),
-    ]  # type: ignore
+    ]
 
     def test_validate(self) -> None:
         for data, _, desc, exception in self.test_strings:

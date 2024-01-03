@@ -7,8 +7,8 @@ import dns.name
 class HostnameException(dns.exception.DNSException):
     """A generic expection abstractions"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(*args, **kwargs)  # type: ignore[no-untyped-call]
 
 
 class UnderscoreError(HostnameException):
@@ -39,5 +39,5 @@ class DomainNameException(HostnameException):
     supp_kwargs = {"dns_exception"}
     fmt = "DNS syntax error: {dns_exception}"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
