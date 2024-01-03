@@ -1,6 +1,7 @@
 # Validating hostnames
 
-The Hostname package provides an `is_hostnbame(str: candidate)` function, which performs syntactic validation of candidate hostname
+The Hostname package provides an `is_hostnbame(candidate: str)` boolean function, which performs syntactic validation of candidate hostname.
+Additionally, it provides as `validate(candidate: str)` function which raises informative exceptions if the candidate is not a valid hostname.
 
 Much to my surprise, or perhaps simply failure to search properly,
 there is no RFC compliant python tool that syntactically validates hostnames.
