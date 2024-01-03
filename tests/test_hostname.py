@@ -20,6 +20,8 @@ class TestHostname(unittest.TestCase):
         ("under_score.in.host", False, "Controversial: no underscore at all", exc.UnderscoreError),
         ("underscore.in.net_work", False, "not allowed in network names", exc.UnderscoreError),
         ("3com.net", True, "Initial digit", None),
+        ("", False, "empty", exc.NoLabelError),
+        ("a.b@d.example", False, "invalid character", exc.InvalidCharacter),
     ]
 
     def test_is_hostname(self) -> None:
@@ -42,6 +44,8 @@ class TestHostnameUnderscore(unittest.TestCase):
         ("3com.net", True, "Initial digit"),
         ("under_score.in.host", True, "allowed with option"),
         ("underscore.in.net_work", False, "not allowed in network names"),
+        ("", False, "empty"),
+        ("a.b@d.example", False, "invalid character"),
     ]
 
     def test_is_hostname(self) -> None:
@@ -64,6 +68,8 @@ class TestExceptions(unittest.TestCase):
         ("under_score.in.host", False, "Controversial: no underscore at all", exc.UnderscoreError),
         ("underscore.in.net_work", False, "not allowed in network names", exc.UnderscoreError),
         ("3com.net", True, "Initial digit", None),
+        ("", False, "empty", exc.NoLabelError),
+        ("a.b@d.example", False, "invalid character", exc.InvalidCharacter),
     ]
 
     def test_validate(self) -> None:

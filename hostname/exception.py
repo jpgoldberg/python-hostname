@@ -5,7 +5,7 @@ import dns.name
 
 
 class HostnameException(dns.exception.DNSException):
-    """A generic expection abstractions"""
+    """A generic exception abstraction"""
 
     def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)  # type: ignore[no-untyped-call]
@@ -16,7 +16,7 @@ class UnderscoreError(HostnameException):
 
 
 class InvalidCharacter(HostnameException):
-    """A forbidden character was found in a lable"""
+    """A forbidden character was found in a label"""
 
 
 class DigitOnlyError(HostnameException):
