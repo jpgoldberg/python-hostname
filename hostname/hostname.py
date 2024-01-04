@@ -45,7 +45,7 @@ class Hostname:
             flags = HostnameFlag(0)
 
         if not isinstance(s, str | bytes):
-            raise ValueError("Expected str input")
+            raise TypeError("Expected str input")
 
         # checks DNS requirements and converts to punycode if needed.
         try:

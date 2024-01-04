@@ -55,7 +55,7 @@ class TestHostnameUnderscore(unittest.TestCase):
                 self.assertEqual(result, expected)
 
 
-class TestExceptions(unittest.TestCase):
+class TestNameExceptions(unittest.TestCase):
     TestString: TypeAlias = tuple[str, bool, str, ExcptionType]
 
     test_strings: ClassVar[list[TestString]] = [
@@ -77,6 +77,9 @@ class TestExceptions(unittest.TestCase):
             if exception is not None:
                 with self.subTest(msg=desc):
                     self.assertRaises(exception, hn.Hostname.validate, data)
+
+    def test_type(self) -> None:
+        self.assertRaises(TypeError, hn.Hostname.validate, 1)
 
 
 if __name__ == "__main__":
