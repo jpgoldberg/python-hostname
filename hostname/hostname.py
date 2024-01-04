@@ -63,7 +63,9 @@ class Hostname:
             raise exc.NoLabelError
 
         for label in labels:
-            cls._validate_label(label, flags)  # will raise exceptions on failure
+            cls._validate_label(
+                label, flags
+            )  # will raise exceptions on failure
 
             # only allowed in first label
             flags = flags & ~HostnameFlag.ALLOW_UNDERSCORE
@@ -75,7 +77,9 @@ class Hostname:
         return dname.to_text()
 
     @classmethod
-    def is_hostname(cls, s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Self]:
+    def is_hostname(
+        cls, s: Any, flags: HostnameFlag | None = None
+    ) -> TypeGuard[Self]:
         """retruns True iff s is a standards complient Internet hostname.
 
         Returns True when s is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
