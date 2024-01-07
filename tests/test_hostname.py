@@ -42,7 +42,7 @@ class TestHostname(unittest.TestCase):
     def test_is_hostname(self) -> None:
         for data, expected, desc, _ in self.test_strings:
             with self.subTest(msg=desc):
-                result = hn.Hostname.is_hostname(data)
+                result = hn.is_hostname(data)
                 self.assertEqual(result, expected)
 
 
@@ -66,9 +66,7 @@ class TestHostnameUnderscore(unittest.TestCase):
     def test_is_hostname(self) -> None:
         for data, expected, desc in self.test_strings:
             with self.subTest(msg=desc):
-                result = hn.Hostname.is_hostname(
-                    data, hn.HostnameFlag.ALLOW_UNDERSCORE
-                )
+                result = hn.is_hostname(data, hn.HostnameFlag.ALLOW_UNDERSCORE)
                 self.assertEqual(result, expected)
 
 
@@ -108,10 +106,10 @@ class TestNameExceptions(unittest.TestCase):
         for data, _, desc, exception in self.test_strings:
             if exception is not None:
                 with self.subTest(msg=desc):
-                    self.assertRaises(exception, hn.Hostname.validate, data)
+                    self.assertRaises(exception, hn.from_text, data)
 
     def test_type(self) -> None:
-        self.assertRaises(TypeError, hn.Hostname.validate, 1)
+        self.assertRaises(TypeError, hn.from_text, 1)
 
 
 if __name__ == "__main__":

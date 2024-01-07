@@ -41,3 +41,16 @@ class DomainNameException(HostnameException):
 
     def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
         super().__init__(*args, **kwargs)
+
+
+# lifted from dnspython.dns.exception
+class INDAException(HostnameException):
+    """IDNA processing raised an exception."""
+
+    supp_kwargs = {"idna_exception"}
+    fmt = "IDNA processing exception: {idna_exception}"
+
+    # We do this as otherwise mypy complains about unexpected keyword argument
+    # idna_exception
+    def __init__(self, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]
+        super().__init__(*args, **kwargs)
