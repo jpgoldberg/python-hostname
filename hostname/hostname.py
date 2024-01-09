@@ -1,4 +1,4 @@
-from typing import Any, TypeGuard, Iterable, Union, Optional
+from typing import Any, TypeGuard, Optional, Self, cast
 from enum import Flag, auto
 
 import hostname.exception as exc
@@ -32,6 +32,9 @@ class HostnameFlag(Flag):
     DENY_IDNA = auto()
 
 
+DEFAULT_FLAGS = HostnameFlag(0)
+
+
 class Name(dns.name.Name):
 
     """A host name.
@@ -40,25 +43,21 @@ class Name(dns.name.Name):
     with additional syntactic constraints specific to hostnames.
     """
 
-    flag_default = HostnameFlag(0)
-
-    def __init__(
-        self,
-        labels: Iterable[Union[bytes, str]],
-        flags: Optional[HostnameFlag] = None,
-    ):
+    def __new__(cls, hostname: str, *args, **kwags) -> Self:
         try:
-            super().__init__(labels)
+            dname = dns.name.from_text(hostname)
         except Exception as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
+        return cast(Self, dname)
+
+    def __init__(self, flags: Optional[HostnameFlag] = None):
         # dns.name.Name is immutable, so we call the mother of all __setattr__
         # to set self.flags
         if flags is None:
-            object.__setattr__(self, "flags", self.flag_default)
+            object.__setattr__(self, "flags", DEFAULT_FLAGS)
         else:
             object.__setattr__(self, "flags", flags)
-
         mutable_flags = self.__getattribute__("flags")
 
         # We need a mutatable list of the labels, and
@@ -98,18 +97,7 @@ def from_text(s: Any, flags: Optional[HostnameFlag] = None) -> Name:
         run the risk of security problems many years from now.
     """
 
-    if not isinstance(s, str):
-        raise TypeError("Expected str input")
-
-    try:
-        dname = dns.name.from_text(s)
-    except Exception as e:
-        raise exc.DomainNameException(dns_exception=e) from e
-
-    if flags is None:
-        flags = HostnameFlag(0)
-
-    return Name(dname.labels, flags=flags)
+    return Name(s, flags=flags)
 
 
 def is_hostname(s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Name]:
@@ -123,7 +111,7 @@ def is_hostname(s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Name]:
 
     try:
         from_text(s, flags)
-    except Exception:
+    except exc.HostnameException:
         return False
     return True
 
@@ -164,7 +152,7 @@ def _validate_host_label(label: str, restrictions: HostnameFlag) -> bool:
 
     blabel: bytes = label.encode()
 
-    ## breaking up statements for debugging
+    # breaking up statements for debugging
     is_label_ascii: bool = label.isascii()
     if not is_label_ascii:
         try:

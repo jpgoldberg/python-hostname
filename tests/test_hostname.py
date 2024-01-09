@@ -63,7 +63,7 @@ class TestHostnameUnderscore(unittest.TestCase):
         ("a.b@d.example", False, "invalid character"),
     ]
 
-    def test_is_hostname(self) -> None:
+    def test_is_hostname_underscore(self) -> None:
         for data, expected, desc in self.test_strings:
             with self.subTest(msg=desc):
                 result = hn.is_hostname(data, hn.HostnameFlag.ALLOW_UNDERSCORE)
