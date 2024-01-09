@@ -1,12 +1,10 @@
-from typing import Any, TypeGuard, Optional, Self, cast
+from typing import Any, TypeGuard, Optional
 from enum import Flag, auto
 
 import hostname.exception as exc
 
 import dns.name
 import dns.exception
-
-import idna
 
 # We will be legitimately be making some ASCII assumptions
 _LOWER_A = ord("a")
@@ -35,7 +33,7 @@ class HostnameFlag(Flag):
 DEFAULT_FLAGS = HostnameFlag(0)
 
 
-class Name(dns.name.Name):
+class Name:
 
     """A host name.
 
@@ -43,34 +41,34 @@ class Name(dns.name.Name):
     with additional syntactic constraints specific to hostnames.
     """
 
-    def __new__(cls, hostname: str, *args, **kwags) -> Self:
+    def __init__(self, hostname: str, flags: Optional[HostnameFlag] = None):
+        # dns.name.Name is immutable, so we call the mother of all __setattr__
+        # to set self.flags
+
+        if not isinstance(hostname, str):
+            raise exc.NotAStringError
+
         try:
-            dname = dns.name.from_text(hostname)
+            self.dnsname = dns.name.from_text(hostname)
         except Exception as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
-        return cast(Self, dname)
-
-    def __init__(self, flags: Optional[HostnameFlag] = None):
-        # dns.name.Name is immutable, so we call the mother of all __setattr__
-        # to set self.flags
-        if flags is None:
-            object.__setattr__(self, "flags", DEFAULT_FLAGS)
-        else:
-            object.__setattr__(self, "flags", flags)
-        mutable_flags = self.__getattribute__("flags")
+        self.flags = DEFAULT_FLAGS
+        if flags is not None:
+            self.flags = flags
 
         # We need a mutatable list of the labels, and
         # it will be convenient to have them be strings.
-        host_labels: list[str] = self.to_unicode().split(".")
+        host_labels: list[bytes] = [e for e in self.dnsname.labels]
         # Exclude the root "" label for our checks
-        if host_labels[-1] == "":
-            host_labels = host_labels[:-1]
+        if host_labels[-1] == b"":
+            host_labels.pop()
 
         # Reject empty hostname
         if len(host_labels) == 0:
             raise exc.NoLabelError
 
+        mutable_flags = self.flags
         for label in host_labels:
             _validate_host_label(
                 label, mutable_flags
@@ -80,11 +78,11 @@ class Name(dns.name.Name):
             mutable_flags = mutable_flags & ~HostnameFlag.ALLOW_UNDERSCORE
 
         # Last (most significant) label cannot be all digits
-        if all(c.isdigit() for c in host_labels[-1]):
+        if all(b >= _DIGIT_0 and b <= _DIGIT_9 for b in host_labels[-1]):
             raise exc.DigitOnlyError
 
 
-def from_text(s: Any, flags: Optional[HostnameFlag] = None) -> Name:
+def from_text(hostname: str, flags: Optional[HostnameFlag] = None) -> Name:
     """retruns a Name if input is synatically valid.
 
     If validation fails, this raises a HostnameException with some details of
@@ -97,26 +95,28 @@ def from_text(s: Any, flags: Optional[HostnameFlag] = None) -> Name:
         run the risk of security problems many years from now.
     """
 
-    return Name(s, flags=flags)
+    return Name(hostname, flags=flags)
 
 
-def is_hostname(s: Any, flags: HostnameFlag | None = None) -> TypeGuard[Name]:
-    """retruns True iff s is a standards complient Internet hostname.
+def is_hostname(
+    candidate: Any, flags: HostnameFlag | None = None
+) -> TypeGuard[Name]:
+    """retruns True iff candidate is a standards complient Internet hostname.
 
-    Returns True when s is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
+    True when candidate is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
 
     *flags*
         *HostnameFlags.ALLOW_UNDERSCORE* allows an underscore in the the first label. This is non-standard behavior. Use the default (False) unless you have a compelling reason to perpetuate non-standard behavior and run the risk of security problems many years from now.
     """
 
     try:
-        from_text(s, flags)
+        Name(candidate, flags)
     except exc.HostnameException:
         return False
     return True
 
 
-def _validate_host_label(label: str, restrictions: HostnameFlag) -> bool:
+def _validate_host_label(label: bytes, restrictions: HostnameFlag) -> bool:
     """For a valid dns label, s, is valid hostname label.
 
     Raises exeptions of various failures
@@ -150,28 +150,18 @@ def _validate_host_label(label: str, restrictions: HostnameFlag) -> bool:
     # documented in sufficient detail, we won't defer to it. Thus, we will only
     # call idna.alabel() on non-ascii candidate labels.
 
-    blabel: bytes = label.encode()
-
-    # breaking up statements for debugging
-    is_label_ascii: bool = label.isascii()
-    if not is_label_ascii:
-        try:
-            blabel = idna.alabel(label)
-        except Exception as e:
-            raise exc.INDAException(idna_exception=e) from e
-
     if HostnameFlag.ALLOW_UNDERSCORE in restrictions:
         underHack = _UNDERSCORE
     else:
         underHack = _NO_SUCH_BYTE
 
     # check for bad hyphens *before* punycode encoding
-    if blabel.startswith(_HYPHEN.to_bytes()) or blabel.endswith(
+    if label.startswith(_HYPHEN.to_bytes()) or label.endswith(
         _HYPHEN.to_bytes()
     ):
         raise exc.BadHyphenError
 
-    for c in blabel:
+    for c in label:
         if not (
             (c >= _LOWER_A and c <= _LOWER_Z)
             or (c >= _UPPER_A and c <= _UPPER_Z)

@@ -15,12 +15,16 @@ class UnderscoreError(HostnameException):
     """An underscore appeared in a label it shouldn't have."""
 
 
+class NotAStringError(HostnameException):
+    """Must be a string"""
+
+
 class InvalidCharacter(HostnameException):
     """A forbidden character was found in a label"""
 
 
 class DigitOnlyError(HostnameException):
-    """The rightmost label is contains only digits"""
+    """The rightmost label contains only digits"""
 
 
 class NoLabelError(HostnameException):

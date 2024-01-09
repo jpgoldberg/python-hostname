@@ -109,7 +109,7 @@ class TestNameExceptions(unittest.TestCase):
                     self.assertRaises(exception, hn.from_text, data)
 
     def test_type(self) -> None:
-        self.assertRaises(TypeError, hn.from_text, 1)
+        self.assertRaises(exc.NotAStringError, hn.from_text, 1)
 
 
 if __name__ == "__main__":
