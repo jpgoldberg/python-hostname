@@ -27,10 +27,10 @@ class HostnameFlag(Flag):
     """
 
     ALLOW_UNDERSCORE = auto()
-    DENY_IDNA = auto()
+    ALLOW_IDNA = auto()
+    ALLOW_EMPTY = auto()
 
-
-DEFAULT_FLAGS = HostnameFlag(0)
+    DEFAULT = ~ALLOW_UNDERSCORE & ALLOW_IDNA & ~ALLOW_EMPTY
 
 
 class Name:
@@ -53,7 +53,7 @@ class Name:
         except Exception as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
-        self.flags = DEFAULT_FLAGS
+        self.flags = HostnameFlag.DEFAULT
         if flags is not None:
             self.flags = flags
 
@@ -116,7 +116,7 @@ def is_hostname(
     return True
 
 
-def _validate_host_label(label: bytes, restrictions: HostnameFlag) -> bool:
+def _validate_host_label(label: bytes, flags: HostnameFlag) -> bool:
     """For a valid dns label, s, is valid hostname label.
 
     Raises exeptions of various failures
@@ -150,7 +150,7 @@ def _validate_host_label(label: bytes, restrictions: HostnameFlag) -> bool:
     # documented in sufficient detail, we won't defer to it. Thus, we will only
     # call idna.alabel() on non-ascii candidate labels.
 
-    if HostnameFlag.ALLOW_UNDERSCORE in restrictions:
+    if HostnameFlag.ALLOW_UNDERSCORE in flags:
         underHack = _UNDERSCORE
     else:
         underHack = _NO_SUCH_BYTE
