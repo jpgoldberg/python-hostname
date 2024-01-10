@@ -55,7 +55,7 @@ class Name:
 
         self.flags = HostnameFlag.DEFAULT
         if flags is not None:
-            self.flags = flags
+            self.flags |= flags
 
         # We need a mutatable list of the labels, and
         # it will be convenient to have them be strings.
@@ -64,9 +64,12 @@ class Name:
         if host_labels[-1] == b"":
             host_labels.pop()
 
-        # Reject empty hostname
+        # Reject empty hostname unless allowed
         if len(host_labels) == 0:
-            raise exc.NoLabelError
+            if HostnameFlag.ALLOW_EMPTY not in self.flags:
+                raise exc.NoLabelError
+            else:
+                return
 
         mutable_flags = self.flags
         for label in host_labels:
