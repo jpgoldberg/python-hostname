@@ -62,27 +62,19 @@ class TestHostnameFlags(unittest.TestCase):
     ]
 
     def test_allow_underscore(self) -> None:
-        self.test_strings.extend(
-            [
-                ("under_score.in.host", True, "allowed with option"),
-                ("", False, "empty"),
-            ]
-        )
-
-        for data, expected, desc in self.test_strings:
+        for data, expected, desc in self.test_strings + [
+            ("under_score.in.host", True, "allowed with option"),
+            ("", False, "empty"),
+        ]:
             with self.subTest(msg=desc):
                 result = hn.is_hostname(data, hn.HostnameFlag.ALLOW_UNDERSCORE)
                 self.assertEqual(result, expected)
 
     def test_allow_empty(self) -> None:
-        self.test_strings.extend(
-            [
-                ("under_score.in.host", False, "allowed with option"),
-                ("", True, "empty"),
-            ]
-        )
-
-        for data, expected, desc in self.test_strings:
+        for data, expected, desc in self.test_strings + [
+            ("under_score.in.host", False, "allowed with option"),
+            ("", True, "empty"),
+        ]:
             with self.subTest(msg=desc):
                 result = hn.is_hostname(data, hn.HostnameFlag.ALLOW_EMPTY)
                 self.assertEqual(result, expected)
