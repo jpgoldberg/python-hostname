@@ -15,6 +15,10 @@ class UnderscoreError(HostnameException):
     """An underscore appeared in a label it shouldn't have."""
 
 
+class NotASCIIError(HostnameException):
+    """Non-ASCII when ALLOW_IDNA is not set"""
+
+
 class NotAStringError(HostnameException):
     """Must be a string"""
 

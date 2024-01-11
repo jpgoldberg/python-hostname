@@ -52,7 +52,6 @@ class TestHostnameFlags(unittest.TestCase):
     test_strings: ClassVar[list[TestString]] = [
         ("a.good.example", True, "simple"),
         ("-initial.hyphen.example", False, "leading hyphen"),
-        ("szárba.szökik.hu", True, "idna"),
         ("no..empty.labels", False, "empty label"),
         ("123.456.78a", True, "digit labels ok"),
         ("last.digits.123", False, "last label digits"),
@@ -65,18 +64,30 @@ class TestHostnameFlags(unittest.TestCase):
         for data, expected, desc in self.test_strings + [
             ("under_score.in.host", True, "allowed with option"),
             ("", False, "empty"),
+            ("szárba.szökik.hu", True, "idna"),
         ]:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, hn.HostnameFlag.ALLOW_UNDERSCORE)
+                result = hn.is_hostname(data, allow_underscore=True)
                 self.assertEqual(result, expected)
 
     def test_allow_empty(self) -> None:
         for data, expected, desc in self.test_strings + [
             ("under_score.in.host", False, "allowed with option"),
             ("", True, "empty"),
+            ("szárba.szökik.hu", True, "idna"),
         ]:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, hn.HostnameFlag.ALLOW_EMPTY)
+                result = hn.is_hostname(data, allow_empty=True)
+                self.assertEqual(result, expected)
+
+    def test_deny_idna(self) -> None:
+        for data, expected, desc in self.test_strings + [
+            ("under_score.in.host", False, "allowed with option"),
+            ("", True, "empty"),
+            ("szárba.szökik.hu", False, "idna"),
+        ]:
+            with self.subTest(msg=desc):
+                result = hn.is_hostname(data, allow_idna=False)
                 self.assertEqual(result, expected)
 
 
