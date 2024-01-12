@@ -5,17 +5,6 @@ import hostname.exception as exc
 import dns.name
 import dns.exception
 
-# We will be legitimately be making some ASCII assumptions
-_LOWER_A = ord("a")
-_LOWER_Z = ord("z")
-_UPPER_A = ord("A")
-_UPPER_Z = ord("Z")
-_DIGIT_0 = ord("0")
-_DIGIT_9 = ord("9")
-_HYPHEN = ord("-")
-_UNDERSCORE = ord("_")
-_NO_SUCH_BYTE = -1
-
 
 class Name:
 
@@ -91,6 +80,17 @@ class Name:
         # way unless you have already checked that you are using
         # 7-bit ASCII.
 
+        # We will be legitimately be making some ASCII assumptions
+        LOWER_A = ord("a")
+        LOWER_Z = ord("z")
+        UPPER_A = ord("A")
+        UPPER_Z = ord("Z")
+        DIGIT_0 = ord("0")
+        DIGIT_9 = ord("9")
+        HYPHEN = ord("-")
+        UNDERSCORE = ord("_")
+        NO_SUCH_BYTE = -1
+
         first: bool = True if index == 0 else False
         last: bool = True if index == len(self.host_labels) - 1 else False
 
@@ -98,15 +98,15 @@ class Name:
         # underHack will be the ord value for the underscore when that is
         # allowed or an int that will never be a byte.
         if self.flags["allow_underscore"] and first:
-            underHack = _UNDERSCORE
+            underHack = UNDERSCORE
         else:
-            underHack = _NO_SUCH_BYTE
+            underHack = NO_SUCH_BYTE
 
         label = self.host_labels[index]
 
         # Last (most significant) label cannot be all digits
         if last:
-            if all(b >= _DIGIT_0 and b <= _DIGIT_9 for b in label):
+            if all(b >= DIGIT_0 and b <= DIGIT_9 for b in label):
                 raise exc.DigitOnlyError
 
         # Hyphens cannot be at start or end of label
@@ -115,13 +115,13 @@ class Name:
 
         for c in label:
             if not (
-                (c >= _LOWER_A and c <= _LOWER_Z)
-                or (c >= _UPPER_A and c <= _UPPER_Z)
-                or (c >= _DIGIT_0 and c <= _DIGIT_9)
-                or c == _HYPHEN
+                (c >= LOWER_A and c <= LOWER_Z)
+                or (c >= UPPER_A and c <= UPPER_Z)
+                or (c >= DIGIT_0 and c <= DIGIT_9)
+                or c == HYPHEN
                 or c == underHack
             ):
-                if c == _UNDERSCORE:
+                if c == UNDERSCORE:
                     raise exc.UnderscoreError
                 else:
                     raise exc.InvalidCharacter
