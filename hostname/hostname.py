@@ -35,11 +35,14 @@ class Name:
         if not isinstance(hostname, str):
             raise exc.NotAStringError
 
-        self.flags = self.DEFAULT_FLAGS
+        self.flags = self.DEFAULT_FLAGS.copy()
         for k, v in kwargs.items():
             if k not in self.DEFAULT_FLAGS:
                 raise ValueError(f'Unknown option "{k}"')
             self.flags[k] = v
+
+        if not (hostname.isascii() or self.flags["allow_idna"]):
+            raise exc.NotASCIIError
 
         try:
             self.dnsname = dns.name.from_text(hostname)
@@ -61,7 +64,7 @@ class Name:
                 return
 
         # We may wish to preserve the flags that this was originally called
-        mutable_flags = self.flags
+        mutable_flags = self.flags.copy()
         for label in host_labels:
             _validate_host_label(
                 label, mutable_flags
