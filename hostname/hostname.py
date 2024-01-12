@@ -78,7 +78,7 @@ class Name:
             raise exc.DigitOnlyError
 
 
-def from_text(hostname: str, **kwargs) -> Name:
+def from_text(hostname: str, **kwargs: bool) -> Name:
     """retruns a Name if input is synatically valid.
 
     If validation fails, this raises a HostnameException with some details of
@@ -94,7 +94,7 @@ def from_text(hostname: str, **kwargs) -> Name:
     return Name(hostname, **kwargs)
 
 
-def is_hostname(candidate: Any, **kwargs) -> TypeGuard[Name]:
+def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Name]:
     """retruns True iff candidate is a standards complient Internet hostname.
 
     True when candidate is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
