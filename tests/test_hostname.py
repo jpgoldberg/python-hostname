@@ -83,7 +83,7 @@ class TestHostnameFlags(unittest.TestCase):
     def test_deny_idna(self) -> None:
         for data, expected, desc in self.test_strings + [
             ("under_score.in.host", False, "allowed with option"),
-            ("", True, "empty"),
+            ("", False, "empty"),
             ("szárba.szökik.hu", False, "idna"),
         ]:
             with self.subTest(msg=desc):
