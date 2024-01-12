@@ -49,33 +49,84 @@ class Name:
         except Exception as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
-        # We need a mutatable list of the labels, and
-        # it will be convenient to have them be strings.
-        host_labels: list[bytes] = [e for e in self.dnsname.labels]
+        # We need a mutatable list of the labels to deal with root
+        self.host_labels: list[bytes] = [e for e in self.dnsname.labels]
         # Exclude the root "" label for our checks
-        if host_labels[-1] == b"":
-            host_labels.pop()
+        if self.host_labels[-1] == b"":
+            self.host_labels.pop()
 
         # Reject empty hostname unless allowed
-        if len(host_labels) == 0:
+        if len(self.host_labels) == 0:
             if not self.flags["allow_empty"]:
                 raise exc.NoLabelError
             else:
                 return
 
-        # We may wish to preserve the flags that this was originally called
-        mutable_flags = self.flags.copy()
-        for label in host_labels:
-            _validate_host_label(
-                label, mutable_flags
-            )  # will raise exceptions on failure
+        for idx, _ in enumerate(self.host_labels):
+            self._validate_label(idx)
 
-            # only allowed in first label
-            mutable_flags["allow_underscore"] = False
+    def _validate_label(self, index: int) -> bool:
+        """For a valid dns label, s, is valid hostname label.
+
+        Raises exeptions of various failures
+        """
+
+        # Valid dns labels are already ASCII and meet length
+        # requirements.
+        #
+        # Labels are composed of letters, digits and hyphens
+        # A hyphen cannot be either the first or the last
+        # character.
+        #
+        # Note that it is very easy to the the regular expression
+        # for RFC 952 wrong. And if we can avoid importing the
+        # regular expression package all together, that is even
+        # better.
+        #
+        # I am taking this from Bob Halley's suggestion on GitHub
+        #
+        #   https://github.com/rthalley/dnspython/issues/1019#issuecomment-1837247696
+        #
+        # Remember kids, don't play with character ranges this
+        # way unless you have already checked that you are using
+        # 7-bit ASCII.
+
+        first: bool = True if index == 0 else False
+        last: bool = True if index == len(self.host_labels) - 1 else False
+
+        # Even allow_underscore only allows it in the first label
+        # underHack will be the ord value for the underscore when that is
+        # allowed or an int that will never be a byte.
+        if self.flags["allow_underscore"] and first:
+            underHack = _UNDERSCORE
+        else:
+            underHack = _NO_SUCH_BYTE
+
+        label = self.host_labels[index]
 
         # Last (most significant) label cannot be all digits
-        if all(b >= _DIGIT_0 and b <= _DIGIT_9 for b in host_labels[-1]):
-            raise exc.DigitOnlyError
+        if last:
+            if all(b >= _DIGIT_0 and b <= _DIGIT_9 for b in label):
+                raise exc.DigitOnlyError
+
+        # Hyphens cannot be at start or end of label
+        if label.startswith(b"-") or label.endswith(b"-"):
+            raise exc.BadHyphenError
+
+        for c in label:
+            if not (
+                (c >= _LOWER_A and c <= _LOWER_Z)
+                or (c >= _UPPER_A and c <= _UPPER_Z)
+                or (c >= _DIGIT_0 and c <= _DIGIT_9)
+                or c == _HYPHEN
+                or c == underHack
+            ):
+                if c == _UNDERSCORE:
+                    raise exc.UnderscoreError
+                else:
+                    raise exc.InvalidCharacter
+
+        return True
 
 
 def from_text(hostname: str, **kwargs: bool) -> Name:
@@ -107,66 +158,4 @@ def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Name]:
         Name(candidate, **kwargs)
     except exc.HostnameException:
         return False
-    return True
-
-
-def _validate_host_label(label: bytes, flags: dict[str, bool]) -> bool:
-    """For a valid dns label, s, is valid hostname label.
-
-    Raises exeptions of various failures
-    """
-
-    # Valid dns labels are already ASCII and meet length
-    # requirements.
-    #
-    # Labels are composed of letters, digits and hyphens
-    # A hyphen cannot be either the first or the last
-    # character.
-    #
-    # Note that it is very easy to the the regular expression
-    # for RFC 952 wrong. And if we can avoid importing the
-    # regular expression package all together, that is even
-    # better.
-    #
-    # I am taking this from Bob Halley's suggestion on GitHub
-    #
-    #   https://github.com/rthalley/dnspython/issues/1019#issuecomment-1837247696
-    #
-    # Remember kids, don't play with character ranges this
-    # way unless you have already checked that you are using
-    # 7-bit ASCII.
-
-    # underHack will be the ord value for the underscore when that is
-    # allowed or an int that will never be a byte.
-
-    # inda.alabel() performs a number of hostname well-formedness checks,
-    # but details of which and the exceptions raised does not appear to be
-    # documented in sufficient detail, we won't defer to it. Thus, we will only
-    # call idna.alabel() on non-ascii candidate labels.
-
-    if flags["allow_underscore"]:
-        underHack = _UNDERSCORE
-    else:
-        underHack = _NO_SUCH_BYTE
-
-    # check for bad hyphens *before* punycode encoding
-    if label.startswith(_HYPHEN.to_bytes()) or label.endswith(
-        _HYPHEN.to_bytes()
-    ):
-        raise exc.BadHyphenError
-
-    for c in label:
-        if not (
-            (c >= _LOWER_A and c <= _LOWER_Z)
-            or (c >= _UPPER_A and c <= _UPPER_Z)
-            or (c >= _DIGIT_0 and c <= _DIGIT_9)
-            or c == _HYPHEN
-            or c == underHack
-        ):
-            if c == _UNDERSCORE:
-                raise exc.UnderscoreError
-            else:
-                raise exc.InvalidCharacter
-        # Starting or ending with "-" is also forbidden.
-
     return True
