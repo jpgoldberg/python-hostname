@@ -8,11 +8,15 @@ import dns.exception
 
 class Name:
 
-    """A host name.
+    """A hostname
 
-    A hostname.hostname.Name class is a kind of dns.name.Name,
-    with additional syntactic constraints specific to hostnames.
+    A hostname must been all of the requirements of a domain name along with
+    addtional contraints that are specific to hostnames.
     """
+
+    _dnsname: dns.name.Name
+    _flags: dict[str, bool]
+    _labels: list[bytes]
 
     DEFAULT_FLAGS: dict[str, bool] = {
         "allow_underscore": False,
@@ -24,37 +28,56 @@ class Name:
         if not isinstance(hostname, str):
             raise exc.NotAStringError
 
-        self.flags = self.DEFAULT_FLAGS.copy()
+        self._flags = self.DEFAULT_FLAGS.copy()
         for k, v in kwargs.items():
             if k not in self.DEFAULT_FLAGS:
                 raise ValueError(f'Unknown option "{k}"')
-            self.flags[k] = v
+            self._flags[k] = v
 
-        if not (hostname.isascii() or self.flags["allow_idna"]):
+        if not (hostname.isascii() or self._flags["allow_idna"]):
             raise exc.NotASCIIError
 
         try:
-            self.dnsname = dns.name.from_text(hostname)
+            self._dnsname = dns.name.from_text(hostname)
         except Exception as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
         # We need a mutatable list of the labels to deal with root
-        self.host_labels: list[bytes] = [e for e in self.dnsname.labels]
+        self._labels: list[bytes] = [e for e in self._dnsname.labels]
         # Exclude the root "" label for our checks
-        if self.host_labels[-1] == b"":
-            self.host_labels.pop()
+        if self._labels[-1] == b"":
+            self._labels.pop()
 
         # Reject empty hostname unless allowed
-        if len(self.host_labels) == 0:
-            if not self.flags["allow_empty"]:
+        if len(self._labels) == 0:
+            if not self._flags["allow_empty"]:
                 raise exc.NoLabelError
             else:
                 return
 
-        for idx, _ in enumerate(self.host_labels):
-            self._validate_label(idx)
+        for idx, label in enumerate(self._labels):
+            self._validate_label(idx, label)
 
-    def _validate_label(self, index: int) -> bool:
+    @property
+    def dnsname(self) -> dns.name.Name:
+        """Returns a dns.name.Name"""
+        return self._dnsname
+
+    @property
+    def flags(self) -> dict[str, bool]:
+        """Returns the flags used when valicating this hostname"""
+        return self._flags
+
+    @property
+    def labels(self) -> list[bytes]:
+        """Returns a list of labels, ordered from leftmost to rightmost.
+
+        Returned list never includes the DNS root label "", if you want
+        the full DNS labels use dnsname().labels
+        """
+        return self._labels
+
+    def _validate_label(self, index: int, label: bytes) -> bool:
         """For a valid dns label, s, is valid hostname label.
 
         Raises exeptions of various failures
@@ -92,17 +115,15 @@ class Name:
         NO_SUCH_BYTE = -1
 
         first: bool = True if index == 0 else False
-        last: bool = True if index == len(self.host_labels) - 1 else False
+        last: bool = True if index == len(self._labels) - 1 else False
 
         # Even allow_underscore only allows it in the first label
         # underHack will be the ord value for the underscore when that is
         # allowed or an int that will never be a byte.
-        if self.flags["allow_underscore"] and first:
+        if self._flags["allow_underscore"] and first:
             underHack = UNDERSCORE
         else:
             underHack = NO_SUCH_BYTE
-
-        label = self.host_labels[index]
 
         # Last (most significant) label cannot be all digits
         if last:
