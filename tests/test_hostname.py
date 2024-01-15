@@ -1,130 +1,123 @@
 import unittest
-from typing import ClassVar, TypeAlias, Union, Type, Tuple
+from typing import ClassVar, Union, Type, Tuple, Set, NamedTuple
 
 import hostname.hostname as hn
 import hostname.exception as exc
 
-ExcptionType = Union[None, Type[Exception], Tuple[Type[Exception], ...]]
+ExceptionType = Union[None, Type[Exception], Tuple[Type[Exception], ...]]
 
 
-class TestHostname(unittest.TestCase):
-    TestString: TypeAlias = tuple[str, bool, str, ExcptionType]
+class TestVector(NamedTuple):
+    candidate: str
+    is_hostname: bool
+    description: str
+    exception: ExceptionType
 
-    test_strings: ClassVar[list[TestString]] = [
-        ("a.good.example", True, "simple", None),
-        (
+
+class VariableVector(NamedTuple):
+    candidate: str
+    good_flags: Set[str]
+    description: str
+    exception_when_false: ExceptionType
+
+    def to_vector(self, flags: Set[str]) -> TestVector:
+        is_hostname: bool
+        exception: ExceptionType
+        if self.good_flags.issubset(flags):
+            is_hostname = True
+            exception = None
+        else:
+            is_hostname = False
+            exception = self.exception_when_false
+
+        return TestVector(
+            self.candidate, is_hostname, self.description, exception
+        )
+
+
+class TestName(unittest.TestCase):
+    # Results for these vectors do not vary as flags vary
+    common_vectors: ClassVar[list[TestVector]] = [
+        TestVector("an.ok.example", True, "simple", None),
+        TestVector("a.single.letter", True, "single letter label", None),
+        TestVector(
             "-initial.hyphen.example",
             False,
             "leading hyphen",
             exc.BadHyphenError,
         ),
-        ("szárba.szökik.hu", True, "idna", None),
-        ("no..empty.labels", False, "empty label", exc.DomainNameException),
-        ("123.456.78a", True, "digit labels ok", None),
-        ("last.digits.123", False, "last label digits", exc.DigitOnlyError),
-        (
-            "under_score.in.host",
-            False,
-            "Controversial: no underscore at all",
-            exc.UnderscoreError,
+        TestVector(
+            "no..empty.labels", False, "empty label", exc.DomainNameException
         ),
-        (
+        TestVector("123.456.78a", True, "digit labels ok", None),
+        TestVector(
             "underscore.in.net_work",
             False,
             "not allowed in network names",
             exc.UnderscoreError,
         ),
-        ("3com.net", True, "Initial digit", None),
-        ("", False, "empty", exc.NoLabelError),
-        ("a.b@d.example", False, "invalid character", exc.InvalidCharacter),
+        TestVector(
+            "last.digits.123", False, "last label digits", exc.DigitOnlyError
+        ),
+        TestVector("3com.net", True, "Initial digit", None),
+        TestVector(
+            "a.b@d.example", False, "invalid character", exc.InvalidCharacter
+        ),
+    ]
+
+    variable_vectors: ClassVar[list[VariableVector]] = [
+        VariableVector(
+            "szárba.szökik.hu", {"allow_idna"}, "idna", exc.NotASCIIError
+        ),
+        VariableVector(
+            "under_score.in.host",
+            {"allow_underscore"},
+            "Controversial: no underscore at all",
+            exc.UnderscoreError,
+        ),
+        VariableVector("", {"allow_empty"}, "empty", exc.NoLabelError),
     ]
 
     def test_is_hostname(self) -> None:
-        for data, expected, desc, _ in self.test_strings:
+        # default flags are {"allow_idna"}
+        other_vectors = [
+            v.to_vector({"allow_idna"}) for v in self.variable_vectors
+        ]
+        for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
                 result = hn.is_hostname(data)
                 self.assertEqual(result, expected)
 
-
-class TestHostnameFlags(unittest.TestCase):
-    TestString: TypeAlias = tuple[str, bool, str]
-
-    test_strings: ClassVar[list[TestString]] = [
-        ("a.good.example", True, "simple"),
-        ("-initial.hyphen.example", False, "leading hyphen"),
-        ("no..empty.labels", False, "empty label"),
-        ("123.456.78a", True, "digit labels ok"),
-        ("last.digits.123", False, "last label digits"),
-        ("3com.net", True, "Initial digit"),
-        ("underscore.in.net_work", False, "not allowed in network names"),
-        ("a.b@d.example", False, "invalid character"),
-    ]
-
     def test_allow_underscore(self) -> None:
-        for data, expected, desc in self.test_strings + [
-            ("under_score.in.host", True, "allowed with option"),
-            ("", False, "empty"),
-            ("szárba.szökik.hu", True, "idna"),
-        ]:
+        other_vectors = [
+            v.to_vector({"allow_idna", "allow_underscore"})
+            for v in self.variable_vectors
+        ]
+        for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, allow_underscore=True)
+                result = hn.is_hostname(data)
                 self.assertEqual(result, expected)
 
     def test_allow_empty(self) -> None:
-        for data, expected, desc in self.test_strings + [
-            ("under_score.in.host", False, "allowed with option"),
-            ("", True, "empty"),
-            ("szárba.szökik.hu", True, "idna"),
-        ]:
+        other_vectors = [
+            v.to_vector({"allow_idna", "allow_underscore"})
+            for v in self.variable_vectors
+        ]
+        for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, allow_empty=True)
+                result = hn.is_hostname(data)
                 self.assertEqual(result, expected)
 
     def test_deny_idna(self) -> None:
-        for data, expected, desc in self.test_strings + [
-            ("under_score.in.host", False, "allowed with option"),
-            ("", False, "empty"),
-            ("szárba.szökik.hu", False, "idna"),
-        ]:
+        other_vectors = [v.to_vector(set()) for v in self.variable_vectors]
+        for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, allow_idna=False)
+                result = hn.is_hostname(data)
                 self.assertEqual(result, expected)
 
-
-class TestNameExceptions(unittest.TestCase):
-    TestString: TypeAlias = tuple[str, bool, str, ExcptionType]
-
-    test_strings: ClassVar[list[TestString]] = [
-        ("a.good.example", True, "simple", None),
-        (
-            "-initial.hyphen.example",
-            False,
-            "leading hyphen",
-            exc.BadHyphenError,
-        ),
-        ("szárba.szökik.hu", True, "idna", None),
-        ("no..empty.labels", False, "empty label", exc.DomainNameException),
-        ("123.456.78a", True, "digit labels ok", None),
-        ("last.digits.123", False, "last label digits", exc.DigitOnlyError),
-        (
-            "under_score.in.host",
-            False,
-            "Controversial: no underscore at all",
-            exc.UnderscoreError,
-        ),
-        (
-            "underscore.in.net_work",
-            False,
-            "not allowed in network names",
-            exc.UnderscoreError,
-        ),
-        ("3com.net", True, "Initial digit", None),
-        ("", False, "empty", exc.NoLabelError),
-        ("a.b@d.example", False, "invalid character", exc.InvalidCharacter),
-    ]
-
     def test_validate(self) -> None:
-        for data, _, desc, exception in self.test_strings:
+        other_vectors = [v.to_vector(set()) for v in self.variable_vectors]
+        for data, _, desc, exception in self.common_vectors + other_vectors:
             if exception is not None:
                 with self.subTest(msg=desc):
                     self.assertRaises(exception, hn.from_text, data)
