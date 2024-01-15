@@ -35,6 +35,13 @@ class VariableVector(NamedTuple):
         )
 
 
+known_flags: list[str] = ["allow_idna", "allow_underscore", "allow_empty"]
+
+
+def flagset_to_dict(flags: set[str]) -> dict[str, bool]:
+    return {f: f in flags for f in known_flags}
+
+
 class TestName(unittest.TestCase):
     # Results for these vectors do not vary as flags vary
     common_vectors: ClassVar[list[TestVector]] = [
@@ -80,39 +87,36 @@ class TestName(unittest.TestCase):
 
     def test_is_hostname(self) -> None:
         # default flags are {"allow_idna"}
-        other_vectors = [
-            v.to_vector({"allow_idna"}) for v in self.variable_vectors
-        ]
+
+        flagset = {"allow_idna"}
+        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data)
+                result = hn.is_hostname(data, **flagset_to_dict(flagset))
                 self.assertEqual(result, expected)
 
     def test_allow_underscore(self) -> None:
-        other_vectors = [
-            v.to_vector({"allow_idna", "allow_underscore"})
-            for v in self.variable_vectors
-        ]
+        flagset = {"allow_idna", "allow_underscore"}
+        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, allow_underscore=True)
+                result = hn.is_hostname(data, **flagset_to_dict(flagset))
                 self.assertEqual(result, expected)
 
     def test_allow_empty(self) -> None:
-        other_vectors = [
-            v.to_vector({"allow_idna", "allow_empty"})
-            for v in self.variable_vectors
-        ]
+        flagset = {"allow_idna", "allow_empty"}
+        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, allow_empty=True)
+                result = hn.is_hostname(data, **flagset_to_dict(flagset))
                 self.assertEqual(result, expected)
 
     def test_deny_idna(self) -> None:
-        other_vectors = [v.to_vector(set()) for v in self.variable_vectors]
+        flagset = set()
+        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, allow_idna=False)
+                result = hn.is_hostname(data, **flagset_to_dict(flagset))
                 self.assertEqual(result, expected)
 
     def test_validate(self) -> None:
