@@ -95,28 +95,30 @@ class TestName(unittest.TestCase):
         ]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data)
+                result = hn.is_hostname(data, allow_underscore=True)
                 self.assertEqual(result, expected)
 
     def test_allow_empty(self) -> None:
         other_vectors = [
-            v.to_vector({"allow_idna", "allow_underscore"})
+            v.to_vector({"allow_idna", "allow_empty"})
             for v in self.variable_vectors
         ]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data)
+                result = hn.is_hostname(data, allow_empty=True)
                 self.assertEqual(result, expected)
 
     def test_deny_idna(self) -> None:
         other_vectors = [v.to_vector(set()) for v in self.variable_vectors]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data)
+                result = hn.is_hostname(data, allow_idna=False)
                 self.assertEqual(result, expected)
 
     def test_validate(self) -> None:
-        other_vectors = [v.to_vector(set()) for v in self.variable_vectors]
+        other_vectors = [
+            v.to_vector({"allow_idna"}) for v in self.variable_vectors
+        ]
         for data, _, desc, exception in self.common_vectors + other_vectors:
             if exception is not None:
                 with self.subTest(msg=desc):
