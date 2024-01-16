@@ -1,5 +1,6 @@
 import unittest
-from typing import ClassVar, Union, Type, Tuple, Set, NamedTuple
+from typing import ClassVar, Union, Type, Tuple, Set, NamedTuple, Generator
+from itertools import combinations
 
 import hostname.hostname as hn
 import hostname.exception as exc
@@ -35,11 +36,20 @@ class VariableVector(NamedTuple):
         )
 
 
-known_flags: list[str] = ["allow_idna", "allow_underscore", "allow_empty"]
+known_flags: set[str] = {"allow_idna", "allow_underscore", "allow_empty"}
 
 
 def flagset_to_dict(flags: set[str]) -> dict[str, bool]:
     return {f: f in flags for f in known_flags}
+
+
+# I haven't learned enough about generics to make this generic Collectable while
+# yielding the same type as the argument
+def powerset(s: set[str]) -> Generator[set[str], None, None]:
+    # explicitly start at 0 to not forget that the empty set is in the powerset
+    for r in range(0, len(s) + 1):
+        for result in combinations(s, r):
+            yield set(result)
 
 
 class TestName(unittest.TestCase):
@@ -96,39 +106,19 @@ class TestName(unittest.TestCase):
                 self.assertEqual(result, expected)
 
     def test_flag_combinations(self) -> None:
-        # Should promgrammatically construct this
-        combos: list[set[str]] = [
-            set(),
-            {"allow_idna"},
-            {"allow_undersocre"},
-            {"allow_empty"},
-            {"allow_idna", "allow_undersocre"},
-            {"allow_idna", "allow_empty"},
-            {"allow_undersocre", "allow_empty"},
-            {"allow_idna", "allow_undersocre", "allow_empty"},
-        ]
-        for flagset in combos:
+        for flagset in powerset(known_flags):
             other_vectors = [
                 v.to_vector(flagset) for v in self.variable_vectors
             ]
-            for data, expected, desc, _ in self.common_vectors + other_vectors:
+            vectors: list[TestVector] = self.common_vectors + other_vectors
+            for data, expected, desc, _ in vectors:
                 with self.subTest(msg=f"{desc} {flagset}"):
                     result = hn.is_hostname(data, **flagset_to_dict(flagset))
                     self.assertEqual(result, expected)
 
     def test_exceptions(self) -> None:
         # Should promgrammatically construct this
-        combos: list[set[str]] = [
-            set(),
-            {"allow_idna"},
-            {"allow_undersocre"},
-            {"allow_empty"},
-            {"allow_idna", "allow_undersocre"},
-            {"allow_idna", "allow_empty"},
-            {"allow_undersocre", "allow_empty"},
-            {"allow_idna", "allow_undersocre", "allow_empty"},
-        ]
-        for flagset in combos:
+        for flagset in powerset(known_flags):
             other_vectors = [
                 v.to_vector(flagset) for v in self.variable_vectors
             ]
