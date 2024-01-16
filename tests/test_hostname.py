@@ -85,48 +85,65 @@ class TestName(unittest.TestCase):
         VariableVector("", {"allow_empty"}, "empty", exc.NoLabelError),
     ]
 
-    def test_is_hostname(self) -> None:
+    def test_default(self) -> None:
         # default flags are {"allow_idna"}
 
         flagset = {"allow_idna"}
         other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
         for data, expected, desc, _ in self.common_vectors + other_vectors:
             with self.subTest(msg=desc):
-                result = hn.is_hostname(data, **flagset_to_dict(flagset))
+                result = hn.is_hostname(data)
                 self.assertEqual(result, expected)
 
-    def test_allow_underscore(self) -> None:
-        flagset = {"allow_idna", "allow_underscore"}
-        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
-        for data, expected, desc, _ in self.common_vectors + other_vectors:
-            with self.subTest(msg=desc):
-                result = hn.is_hostname(data, **flagset_to_dict(flagset))
-                self.assertEqual(result, expected)
-
-    def test_allow_empty(self) -> None:
-        flagset = {"allow_idna", "allow_empty"}
-        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
-        for data, expected, desc, _ in self.common_vectors + other_vectors:
-            with self.subTest(msg=desc):
-                result = hn.is_hostname(data, **flagset_to_dict(flagset))
-                self.assertEqual(result, expected)
-
-    def test_deny_idna(self) -> None:
-        flagset = set()
-        other_vectors = [v.to_vector(flagset) for v in self.variable_vectors]
-        for data, expected, desc, _ in self.common_vectors + other_vectors:
-            with self.subTest(msg=desc):
-                result = hn.is_hostname(data, **flagset_to_dict(flagset))
-                self.assertEqual(result, expected)
-
-    def test_validate(self) -> None:
-        other_vectors = [
-            v.to_vector({"allow_idna"}) for v in self.variable_vectors
+    def test_flag_combinations(self) -> None:
+        # Should promgrammatically construct this
+        combos: list[set[str]] = [
+            set(),
+            {"allow_idna"},
+            {"allow_undersocre"},
+            {"allow_empty"},
+            {"allow_idna", "allow_undersocre"},
+            {"allow_idna", "allow_empty"},
+            {"allow_undersocre", "allow_empty"},
+            {"allow_idna", "allow_undersocre", "allow_empty"},
         ]
-        for data, _, desc, exception in self.common_vectors + other_vectors:
-            if exception is not None:
-                with self.subTest(msg=desc):
-                    self.assertRaises(exception, hn.from_text, data)
+        for flagset in combos:
+            other_vectors = [
+                v.to_vector(flagset) for v in self.variable_vectors
+            ]
+            for data, expected, desc, _ in self.common_vectors + other_vectors:
+                with self.subTest(msg=f"{desc} {flagset}"):
+                    result = hn.is_hostname(data, **flagset_to_dict(flagset))
+                    self.assertEqual(result, expected)
+
+    def test_exceptions(self) -> None:
+        # Should promgrammatically construct this
+        combos: list[set[str]] = [
+            set(),
+            {"allow_idna"},
+            {"allow_undersocre"},
+            {"allow_empty"},
+            {"allow_idna", "allow_undersocre"},
+            {"allow_idna", "allow_empty"},
+            {"allow_undersocre", "allow_empty"},
+            {"allow_idna", "allow_undersocre", "allow_empty"},
+        ]
+        for flagset in combos:
+            other_vectors = [
+                v.to_vector(flagset) for v in self.variable_vectors
+            ]
+            for data, _, desc, exception in (
+                self.common_vectors + other_vectors
+            ):
+                # We must explicitly narrow exception
+                if exception is not None:
+                    with self.subTest(msg=f"{desc} {flagset}"):
+                        self.assertRaises(
+                            exception,
+                            hn.from_text,
+                            data,
+                            **flagset_to_dict(flagset),
+                        )
 
     def test_type(self) -> None:
         self.assertRaises(exc.NotAStringError, hn.from_text, 1)
