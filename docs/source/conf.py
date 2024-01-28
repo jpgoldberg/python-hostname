@@ -21,22 +21,20 @@ author = ",".join([author["name"] for author in pyproject["authors"]])
 copyright = f"2024 {author}"
 
 
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
-project = "Hostname"
-copyright = "2024, Jeffrey Goldberg"
-author = "Jeffrey Goldberg"
-
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions: list[str] = []
+extensions: list[str] = [
+    "sphinx.ext.autodoc",
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.doctest",
+]
+
+extensions.append("sphinx.ext.intersphinx")
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "dns": ("https://dnspython.readthedocs.io/en/stable/", None),
+}
 
 templates_path = ["_templates"]
 exclude_patterns: list[str] = []

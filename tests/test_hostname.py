@@ -6,10 +6,9 @@ from typing import (
     Tuple,
     Set,
     NamedTuple,
-    Generator,
 )
-from itertools import combinations
-from collections.abc import Hashable
+
+from powerset_generator import subsets
 
 import hostname.name as hn
 import hostname.exception as exc
@@ -53,14 +52,6 @@ class TestName(unittest.TestCase):
     @classmethod
     def flagset_to_dict(cls, flags: set[str]) -> dict[str, bool]:
         return {f: f in flags for f in cls.known_flags}
-
-    @staticmethod
-    def powerset[T: Hashable](s: set[T]) -> Generator[set[T], None, None]:
-        """Generates the members of the powerset of s."""
-
-        for r in range(0, len(s) + 1):
-            for result in combinations(s, r):
-                yield set(result)
 
     # Results for these vectors do not vary as flags vary
     common_vectors: ClassVar[list[TVector]] = [
@@ -115,7 +106,7 @@ class TestName(unittest.TestCase):
                 self.assertEqual(result, expected)
 
     def test_flag_combinations(self) -> None:
-        for flagset in TestName.powerset(TestName.known_flags):
+        for flagset in subsets(TestName.known_flags):
             other_vectors = [
                 v.to_vector(flagset) for v in self.variable_vectors
             ]
@@ -129,7 +120,7 @@ class TestName(unittest.TestCase):
 
     def test_exceptions(self) -> None:
         # Should promgrammatically construct this
-        for flagset in TestName.powerset(TestName.known_flags):
+        for flagset in subsets(TestName.known_flags):
             other_vectors = [
                 v.to_vector(flagset) for v in self.variable_vectors
             ]
