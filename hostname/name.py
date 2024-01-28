@@ -150,22 +150,6 @@ class Name:
         return True
 
 
-def from_text(hostname: str, **kwargs: bool) -> Name:
-    """retruns a Name if input is synatically valid.
-
-    If validation fails, this raises a HostnameException with some details of
-    why it failed
-
-    *flags*
-        *HostnameFlags.ALLOW_UNDERSCORE* allows an underscore in the the first
-        label. This is non-standard behavior. Use the default (False) unless
-        you have a compelling reason to perpetuate non-standard behavior and
-        run the risk of security problems many years from now.
-    """
-
-    return Name(hostname, **kwargs)
-
-
 def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Name]:
     """retruns True iff candidate is a standards complient Internet hostname.
 

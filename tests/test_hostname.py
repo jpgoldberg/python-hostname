@@ -7,17 +7,17 @@ from typing import (
     Set,
     NamedTuple,
     Generator,
-    TypeVar,
 )
 from itertools import combinations
+from collections.abc import Hashable
 
-import hostname.hostname as hn
+import hostname.name as hn
 import hostname.exception as exc
 
 ExceptionType = Union[None, Type[Exception], Tuple[Type[Exception], ...]]
 
 
-class TestVector(NamedTuple):
+class TVector(NamedTuple):
     candidate: str
     is_hostname: bool
     description: str
@@ -30,7 +30,7 @@ class VariableVector(NamedTuple):
     description: str
     exception_when_false: ExceptionType
 
-    def to_vector(self, flags: Set[str]) -> TestVector:
+    def to_vector(self, flags: Set[str]) -> TVector:
         is_hostname: bool
         exception: ExceptionType
         if self.good_flags.issubset(flags):
@@ -40,7 +40,7 @@ class VariableVector(NamedTuple):
             is_hostname = False
             exception = self.exception_when_false
 
-        return TestVector(
+        return TVector(
             self.candidate, is_hostname, self.description, exception
         )
 
@@ -54,41 +54,39 @@ class TestName(unittest.TestCase):
     def flagset_to_dict(cls, flags: set[str]) -> dict[str, bool]:
         return {f: f in flags for f in cls.known_flags}
 
-    T = TypeVar("T")
-
     @staticmethod
-    def powerset(s: set[T]) -> Generator[set[T], None, None]:
-        # explicitly start at 0 to not forget that the empty set
-        # is in the powerset
+    def powerset[T: Hashable](s: set[T]) -> Generator[set[T], None, None]:
+        """Generates the members of the powerset of s."""
+
         for r in range(0, len(s) + 1):
             for result in combinations(s, r):
                 yield set(result)
 
     # Results for these vectors do not vary as flags vary
-    common_vectors: ClassVar[list[TestVector]] = [
-        TestVector("an.ok.example", True, "simple", None),
-        TestVector("a.single.letter", True, "single letter label", None),
-        TestVector(
+    common_vectors: ClassVar[list[TVector]] = [
+        TVector("an.ok.example", True, "simple", None),
+        TVector("a.single.letter", True, "single letter label", None),
+        TVector(
             "-initial.hyphen.example",
             False,
             "leading hyphen",
             exc.BadHyphenError,
         ),
-        TestVector(
+        TVector(
             "no..empty.labels", False, "empty label", exc.DomainNameException
         ),
-        TestVector("123.456.78a", True, "digit labels ok", None),
-        TestVector(
+        TVector("123.456.78a", True, "digit labels ok", None),
+        TVector(
             "underscore.in.net_work",
             False,
             "not allowed in network names",
             exc.UnderscoreError,
         ),
-        TestVector(
+        TVector(
             "last.digits.123", False, "last label digits", exc.DigitOnlyError
         ),
-        TestVector("3com.net", True, "Initial digit", None),
-        TestVector(
+        TVector("3com.net", True, "Initial digit", None),
+        TVector(
             "a.b@d.example", False, "invalid character", exc.InvalidCharacter
         ),
     ]
@@ -121,7 +119,7 @@ class TestName(unittest.TestCase):
             other_vectors = [
                 v.to_vector(flagset) for v in self.variable_vectors
             ]
-            vectors: list[TestVector] = self.common_vectors + other_vectors
+            vectors: list[TVector] = self.common_vectors + other_vectors
             for data, expected, desc, _ in vectors:
                 with self.subTest(msg=f"{desc} {flagset}"):
                     result = hn.is_hostname(
@@ -143,13 +141,10 @@ class TestName(unittest.TestCase):
                     with self.subTest(msg=f"{desc} {flagset}"):
                         self.assertRaises(
                             exception,
-                            hn.from_text,
+                            hn.Name,
                             data,
                             **TestName.flagset_to_dict(flagset),
                         )
-
-    def test_type(self) -> None:
-        self.assertRaises(exc.NotAStringError, hn.from_text, 1)
 
 
 if __name__ == "__main__":
