@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 A Python validator for Internet hostnames
-====================================
+===========================================
 
 Not all valid DNS names are valid hostnames, although all valid hostnames are valid DNS names.
 
@@ -47,7 +47,7 @@ For example
 
 should raise :class:`hostname.exception.DigitsOnlyError`.
 
-The full list of expections is documented in
+The full list of expections is documented in :doc:`exceptions`.
 
 
 

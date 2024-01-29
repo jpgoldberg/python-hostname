@@ -7,11 +7,12 @@ sys.path.insert(0, os.path.abspath("../.."))
 
 from hostname import __about__  # noqa: E402
 
+version = __about__.__version__
+
 # Pull general sphinx project info from pyproject.toml
+# Modified from https://stackoverflow.com/a/75396624/1304076
 with open("../../pyproject.toml", "rb") as f:
     toml = tomllib.load(f)
-
-version = __about__.__version__
 
 pyproject = toml["project"]
 
