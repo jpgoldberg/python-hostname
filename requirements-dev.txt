@@ -2,4 +2,4 @@ pre-commit
 mypy
 ruff
 black
-powerset_generator
+powerset_generator>=0.1.1
