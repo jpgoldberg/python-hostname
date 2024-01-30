@@ -6,6 +6,18 @@ import dns.name
 import dns.exception
 
 
+class Hostname(str):
+    """A string that is also a valid hostname."""
+
+    def __new__(cls, value, *args, **kwargs):
+        # explicitly only pass value to the str constructor
+
+        if not is_hostname(value):
+            raise ValueError("Not a valid hostname")
+
+        return super(Hostname, cls).__new__(cls, value)
+
+
 class Name:
 
     """A hostname
@@ -163,7 +175,7 @@ class Name:
         return True
 
 
-def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Name]:
+def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Hostname]:
     """retruns True iff candidate is a standards complient Internet hostname.
 
     :rtype: bool
