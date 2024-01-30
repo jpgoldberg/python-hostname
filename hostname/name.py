@@ -1,4 +1,4 @@
-from typing import Any, TypeGuard
+from typing import Any, TypeGuard, Self
 
 import hostname.exception as exc
 
@@ -9,7 +9,7 @@ import dns.exception
 class Hostname(str):
     """A string that is also a valid hostname."""
 
-    def __new__(cls, value, *args, **kwargs):
+    def __new__(cls, value: Any, **kwargs: bool) -> Self:
         # explicitly only pass value to the str constructor
 
         if not is_hostname(value):
