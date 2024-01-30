@@ -27,9 +27,13 @@ copyright = f"2024 {author}"
 
 extensions: list[str] = [
     "sphinx.ext.autodoc",
-    "sphinx_autodoc_typehints",
     "sphinx.ext.doctest",
 ]
+
+extensions.append("sphinx_autodoc_typehints")
+type_hints_use_signature = True
+typehints_use_signature_return = True
+
 
 extensions.append("sphinx.ext.intersphinx")
 intersphinx_mapping = {

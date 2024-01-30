@@ -24,14 +24,15 @@ class Name:
 
     :param candidate: A candidate hostname
     :type candidate: str
-    :param kwargs: Boolean keyword arguments:
-       :code:`allow_idna` (default :py:const:`True`),
-       ``allow_underscore`` (default |False|),
-       ``allow_empty`` (default |False|)
-    :type kwargs: dict[str, bool]
 
     A hostname must been all of the requirements of a domain name along with
     addtional contraints that are specific to hostnames.
+
+    ``**kwargs`` can be any of
+        - :code:`allow_idna` (default :py:const:`True`),
+        - ``allow_underscore`` (default |False|),
+        - ``allow_empty`` (default |False|)
+
     """
 
     _dnsname: dns.name.Name
@@ -177,13 +178,13 @@ class Name:
 def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Hostname]:
     """retruns True iff candidate is a standards complient Internet hostname.
 
-    :param candidate: A candidate hostname
-    :type candidate: str
-    :param kwargs: Boolean keyword arguments:
-       :code:`allow_idna` (default :py:const:`True`),
-       ``allow_underscore`` (default |False|),
-       ``allow_empty`` (default |False|)
-    :type kwargs: dict[str, bool]
+    :rtype: bool
+
+    ``**kwargs`` can be any of
+        - :code:`allow_idna` (default :py:const:`True`),
+        - ``allow_underscore`` (default |False|),
+        - ``allow_empty`` (default |False|)
+
     """
 
     try:
