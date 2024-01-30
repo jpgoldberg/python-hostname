@@ -43,6 +43,8 @@ exclude_patterns: list[str] = []
 rst_prolog = f"""
 .. |project| replace:: **{project}**
 .. |root| replace:: :mod:`hostname`
+.. |True| replace:: :py:const:`True`
+.. |False| replace:: :py:const:`False`
 """
 
 

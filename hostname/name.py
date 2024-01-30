@@ -10,6 +10,14 @@ class Name:
 
     """A hostname
 
+    :param candidate: A candidate hostname
+    :type candidate: str
+    :param kwargs: Boolean keyword arguments:
+       :code:`allow_idna` (default :py:const:`True`),
+       ``allow_underscore`` (default |False|),
+       ``allow_empty`` (default |False|)
+    :type kwargs: dict[str, bool]
+
     A hostname must been all of the requirements of a domain name along with
     addtional contraints that are specific to hostnames.
     """
@@ -24,8 +32,11 @@ class Name:
         "allow_idna": True,
     }
 
-    def __init__(self, hostname: str, **kwargs: bool):
-        if not isinstance(hostname, str):
+    def __init__(self, candidate: str, **kwargs: bool):
+        """
+        Initializes a Name if candidate is valid
+        """
+        if not isinstance(candidate, str):
             raise exc.NotAStringError
 
         self._flags = self.DEFAULT_FLAGS.copy()
@@ -34,11 +45,11 @@ class Name:
                 raise ValueError(f'Unknown option "{k}"')
             self._flags[k] = v
 
-        if not (hostname.isascii() or self._flags["allow_idna"]):
+        if not (candidate.isascii() or self._flags["allow_idna"]):
             raise exc.NotASCIIError
 
         try:
-            self._dnsname = dns.name.from_text(hostname)
+            self._dnsname = dns.name.from_text(candidate)
         except Exception as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
@@ -60,7 +71,7 @@ class Name:
 
     @property
     def dnsname(self) -> dns.name.Name:
-        """Returns a dns.name.Name"""
+        """Returns a :class:`dns.name.Name`."""
         return self._dnsname
 
     @property
@@ -72,8 +83,9 @@ class Name:
     def labels(self) -> list[bytes]:
         """Returns a list of labels, ordered from leftmost to rightmost.
 
-        Returned list never includes the DNS root label "", if you want
-        the full DNS labels use dnsname().labels
+        Returned list never includes the DNS root label ``""``.
+        If you want the full DNS labels use :func:`dnsname()`
+        and use the :attr:`dns.name.Name.labels` for that list.
         """
         return self._labels
 
@@ -153,10 +165,13 @@ class Name:
 def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Name]:
     """retruns True iff candidate is a standards complient Internet hostname.
 
-    True when candidate is a valid hostname following RFCs defining hostnames, domain names, and IDNA.
-
-    *flags*
-        *HostnameFlags.ALLOW_UNDERSCORE* allows an underscore in the the first label. This is non-standard behavior. Use the default (False) unless you have a compelling reason to perpetuate non-standard behavior and run the risk of security problems many years from now.
+    :param candidate: A candidate hostname
+    :type candidate: str
+    :param kwargs: Boolean keyword arguments:
+       :code:`allow_idna` (default :py:const:`True`),
+       ``allow_underscore`` (default |False|),
+       ``allow_empty`` (default |False|)
+    :type kwargs: dict[str, bool]
     """
 
     try:
