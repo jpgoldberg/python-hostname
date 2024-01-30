@@ -146,6 +146,15 @@ class TestName(unittest.TestCase):
                             **TestName.flagset_to_dict(flagset),
                         )
 
+    def test_typeguard(self) -> None:
+        s = hn.Hostname("an.example")
+
+        with self.subTest(msg="Hostname instance"):
+            self.assertTrue(isinstance(s, hn.Hostname))
+
+        with self.subTest(msg="str instance"):
+            self.assertTrue(isinstance(s, str))
+
 
 if __name__ == "__main__":
     unittest.main()
