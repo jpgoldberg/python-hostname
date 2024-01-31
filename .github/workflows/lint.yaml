@@ -18,7 +18,7 @@ jobs:
       - name: mypy check
         uses: jpetrucciani/mypy-check@master
         with:
-          requirements_file: "requirements.txt"
+          requirements_file: "requirements-typing.txt"
           python_version: "3.11"
           path: '.'
       - name: Create mypy badge
