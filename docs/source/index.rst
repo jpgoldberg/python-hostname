@@ -9,14 +9,14 @@ A Python validator for Internet hostnames
 Not all valid DNS names are valid hostnames, although all valid hostnames are valid DNS names.
 
 The |project| package package provides
-:func:`hostname.name.is_hostname`
+:func:`hostname.is_hostname`
 boolean function, which performs syntactic validation of candidate hostname.
 This validation only on the form of the candidate hostname.
 It does *not* check whether the name exists in the DNS system.
 
 .. testcode:: python
 
-   import hostname.name
+   import hostname
 
    candidates = [
       "an.ok.example",  # Good
@@ -26,24 +26,24 @@ It does *not* check whether the name exists in the DNS system.
       "last.digits.123", # But last label cannot be all digits
    ]
 
-   [ hostname.name.is_hostname(c) for c in candidates ]
+   [ hostname.is_hostname(c) for c in candidates ]
 
 .. testoutput::
 
    [True, True, False, True, False]
 
-The :class:`hostname.name.Name(candidate: str)` will return a new and initialized
-:class:`hostname.name.Name` if and only if its argument is a valid hostname.
+The :class:`hostname.Name(candidate: str)` will return a new and initialized
+:class:`hostname.Name` if and only if its argument is a valid hostname.
 Otherwise it will raise an exception, which will contain some information about why validation failed.
 
 For example
 
 .. code-block:: python
 
-   import hostname.name
+   import hostname
    import hostname.exception as exc
 
-   bad_name = hostname.name.Name("last.digits.123")
+   bad_name = hostname.Name("last.digits.123")
 
 should raise :class:`hostname.exception.DigitsOnlyError`.
 
