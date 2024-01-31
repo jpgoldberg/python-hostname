@@ -1,0 +1,5 @@
+# type checking requires powerset-generator
+# Used in .github/workflows/lint.yml
+
+-r requirements.txt
+powerset-generator >= 0.1.1

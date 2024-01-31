@@ -15,12 +15,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
-      - name: Install powerset
-        run: pip install powerset-generator
       - name: mypy check
         uses: jpetrucciani/mypy-check@master
         with:
-          requirements_file: "requirements.txt"
+          requirements_file: "requirements-typing.txt"
           python_version: "3.11"
           path: '.'
       - name: Create mypy badge
