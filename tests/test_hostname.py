@@ -10,7 +10,7 @@ from typing import (
 
 from powerset_generator import subsets
 
-import hostname.name as hn
+import hostname as hn
 import hostname.exception as exc
 
 ExceptionType = Union[None, Type[Exception], Tuple[Type[Exception], ...]]
