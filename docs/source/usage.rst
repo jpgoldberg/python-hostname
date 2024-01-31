@@ -48,7 +48,7 @@ The :class:`hostname.Name` is the substantive class.
     :members:
 
 If ``candidate`` is not a valid hostname, initializing the class will one
-of the :exc:`hostname.exceptions.HostnameException` :doc:`exceptions`.
+of the :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 
 Hostname
 ^^^^^^^^
@@ -58,7 +58,7 @@ The :class:`hostname.Hostname` should be thought of as a subtype of :py:class:`s
 .. autoclass:: hostname.Hostname
 
 If ``candidate`` is not a valid hostname, initializing the class will one
-of the :exc:`hostname.exceptions.HostnameException` :doc:`exceptions`.
+of the :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 ``**kwargs`` are described in :ref:`sec-flags`.
 
 
@@ -73,7 +73,7 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     When |True|, a hostname candidate hostname like
     ``"szárba.szökik.hu"`` will be accepted.
     When |False| such a candidate will raise an
-    :exc:`hostname.exceptions.NotASCIIError` error.
+    :exc:`hostname.exception.NotASCIIError` error.
 
     Default |True|
 
@@ -91,7 +91,7 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     When |True|, a hostname candidate hostname like
     ``""`` will be accepted.
     When |False| such a candidate will raise an
-    :exc:`hostname.exceptions.NoLabelError` error.
+    :exc:`hostname.exception.NoLabelError` error.
 
     Default |False|
 
@@ -105,7 +105,7 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     When |True|, a hostname candidate hostname like
     ``"under_score.in.host"`` will be accepted.
     When |False| such a candidate will raise an
-    :exc:`hostname.exceptions.UnderscoreError` error.
+    :exc:`hostname.exception.UnderscoreError` error.
 
     Default |False|
 
@@ -118,7 +118,7 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
 
     In all cases, a candidate with an underscore anywhere other than
     in the first (leftmost) label,
-    such as ``"underscore.in.net_work"`` will raise an  :exc:`hostname.exceptions.UnderscoreError`.
+    such as ``"underscore.in.net_work"`` will raise an  :exc:`hostname.exception.UnderscoreError`.
 
     >>> is_hostname("leftmost.not_leftmost.example")
     False
