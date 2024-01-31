@@ -30,6 +30,12 @@ extensions: list[str] = [
     "sphinx.ext.doctest",
 ]
 
+# ## doctest setup
+doctest_global_setup = """
+from hostname import is_hostname, Name, Hostname
+import hostname.exception
+"""
+
 extensions.append("sphinx_autodoc_typehints")
 type_hints_use_signature = True
 typehints_use_signature_return = True
