@@ -6,6 +6,11 @@ A python package for syntactically validating and parsing hostnames.
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v0.json)](https://github.com/charliermarsh/ruff)
 [![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 
+Real [documentation](https://jpgoldberg.github.io/python-hostname/) is a work in progress,
+but is more likely to be correct than the `README` file you are now reading.
+
+-----------------
+
 Much to my surprise, or perhaps simply failure to search properly,
 there there no RFC compliant python tool that syntactically validates hostnames.
 Note that not all valid domain names are valid hostnames.

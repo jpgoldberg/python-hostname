@@ -20,6 +20,8 @@ dependencies = [
 [project.urls]
 Source = "https://github.com/jpgoldberg/python-hostname"
 Issues = "https://github.com/jpgoldberg/python-hostname/issues"
+Documentation = "https://jpgoldberg.github.io/python-hostname/"
+Changelog = "https://github.com/jpgoldberg/python-hostname/blob/main/CHANGELOG.md"
 
 
 
