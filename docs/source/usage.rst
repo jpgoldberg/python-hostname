@@ -25,15 +25,35 @@ The function, :func:`hostname.is_hostname` returns |True| if and only
 if its argument is a syntactically valid hostname.
 It's behavior can be adjusted slightly with some flags which can be set as keyword arguements.
 
-Additionally it acts as a :py:class:`typing.TypeGuard`,
-allowing type checkers to know that any object which
-passes the test is a :class:`hostname.Hostname`.
-
 >>> is_hostname("a.good.example")
 True
 
 >>> is_hostname("a.-bad-.example")
 False
+
+Additionally it acts as a :pep:`647` :py:mod:`typing` ``TypeGuard``,
+allowing type checkers to know that any object which
+passes the test is a :class:`hostname.Hostname`.
+
+.. code-block:: python
+
+    import hostname
+
+    def do_something_with_hostname(hostname: hostname.Hostname) -> None:
+        pass
+
+    name1: str = "www.example"
+
+    do_something_with_hostname(name1)  # Fails type checking
+
+    if not hostname.is_hostname(name1):
+        raise TypeError('Expected valid Hostname')
+
+    do_something_with_hostname(name1)  # Passes type checking
+
+    name1 = name1.upper() # creates new str object.
+
+    do_something_with_hostname(name1)  # Fails type checking
 
 
 Classes
