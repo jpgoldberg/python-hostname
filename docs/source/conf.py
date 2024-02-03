@@ -5,6 +5,8 @@ import tomllib
 sys.path.insert(0, os.path.abspath("."))
 sys.path.insert(0, os.path.abspath("../.."))
 
+import hostname  # noqa
+
 from hostname import __about__  # noqa: E402
 
 version = __about__.__version__

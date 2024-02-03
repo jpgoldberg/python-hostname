@@ -25,15 +25,17 @@ The function, :func:`hostname.is_hostname` returns |True| if and only
 if its argument is a syntactically valid hostname.
 It's behavior can be adjusted slightly with some flags which can be set as keyword arguements.
 
->>> is_hostname("a.good.example")
+>>> is_hostname("a.go-od.example")
 True
 
->>> is_hostname("a.-bad-.example")
+>>> is_hostname("a.-bad.example")
 False
 
-Additionally it acts as a :pep:`647` :py:mod:`typing` ``TypeGuard``,
+Additionally it acts as a :pep:`647` :py:class:`typing.TypeGuard`,
 allowing type checkers to know that any object which
 passes the test is a :class:`hostname.Hostname`.
+
+
 
 .. code-block:: python
 
