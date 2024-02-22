@@ -32,8 +32,17 @@ It does *not* check whether the name exists in the DNS system.
 
    [True, True, False, True, False]
 
-The :class:`hostname.Name(candidate: str)` will return a new and initialized
+The :class:`hostname.Hostname(candidate: str)` will return a new and initialized
 :class:`hostname.Name` if and only if its argument is a valid hostname.
+
+>>> hn = hostname.Hostname("foo.bar.example")
+>>> type(hn)
+<class 'hostname.Hostname'>
+>>> isinstance(hn, str)
+True
+>>> hn.labels
+[b'foo', b'bar', b'example']
+
 Otherwise it will raise an exception, which will contain some information about why validation failed.
 
 For example
@@ -43,7 +52,7 @@ For example
    import hostname
    import hostname.exception as exc
 
-   bad_name = hostname.Name("last.digits.123")
+   bad_name = hostname.Hostname("last.digits.123")
 
 should raise :class:`hostname.exception.DigitsOnlyError`.
 

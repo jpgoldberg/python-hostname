@@ -4,7 +4,7 @@ Using |project|
 Common signature
 ----------------
 
-The two classes and one function described here have a common signature:
+The class, :class:`Hostname`, and the function, :func:`is_hostname`, described here have a common signature:
 
   :samp:`{funcOrClass}(candidate: Any, **kwargs: bool) -> {rtype}`
 
@@ -42,7 +42,7 @@ passes the test is a :class:`hostname.Hostname`.
     import hostname
 
     def do_something_with_hostname(hostname: hostname.Hostname) -> None:
-        pass
+        ...
 
     name1: str = "www.example"
 
@@ -61,28 +61,18 @@ passes the test is a :class:`hostname.Hostname`.
 Classes
 -------
 
-Name
-^^^^^
-
-The :class:`hostname.Name` is the substantive class.
-
-.. autoclass:: hostname.Name
-    :members:
-
-If ``candidate`` is not a valid hostname, initializing the class will one
-of the :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
-
 Hostname
 ^^^^^^^^
 
-The :class:`hostname.Hostname` should be thought of as a subtype of :py:class:`str`.
+The :class:`hostname.Hostname` is a subtype of :py:class:`str`.
 
-.. autoclass:: hostname.Hostname
-
-If ``candidate`` is not a valid hostname, initializing the class will one
-of the :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
+If ``candidate`` is not a valid hostname,
+initializing the class will raise one of the
+:exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 ``**kwargs`` are described in :ref:`sec-flags`.
 
+.. autoclass:: hostname.Hostname
+    :members:
 
 .. _sec-flags:
 

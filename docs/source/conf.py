@@ -34,7 +34,7 @@ extensions: list[str] = [
 
 # ## doctest setup
 doctest_global_setup = """
-from hostname import is_hostname, Name, Hostname
+from hostname import is_hostname, Hostname
 import hostname.exception
 """
 
