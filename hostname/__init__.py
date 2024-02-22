@@ -11,32 +11,6 @@ from . import __about__  # noqa: F401
 class Hostname(str):
     """A string that is also a valid hostname."""
 
-    def __new__(cls, value: Any, **kwargs: bool) -> Self:
-        # explicitly only pass value to the str constructor
-
-        if not is_hostname(value):
-            raise ValueError("Not a valid hostname")
-
-        return super(Hostname, cls).__new__(cls, value)
-
-
-class Name:
-
-    """A hostname
-
-    :param candidate: A candidate hostname
-    :type candidate: str
-
-    A hostname must been all of the requirements of a domain name along with
-    addtional contraints that are specific to hostnames.
-
-    ``**kwargs`` can be any of
-        - :code:`allow_idna` (default :py:const:`True`),
-        - ``allow_underscore`` (default |False|),
-        - ``allow_empty`` (default |False|)
-
-    """
-
     _dnsname: dns.name.Name
     _flags: dict[str, bool]
     _labels: list[bytes]
@@ -47,9 +21,13 @@ class Name:
         "allow_idna": True,
     }
 
+    def __new__(cls, value: Any, **kwargs: bool) -> Self:
+        # explicitly only pass value to the str constructor
+        return str.__new__(cls, value)
+
     def __init__(self, candidate: str, **kwargs: bool):
         """
-        Initializes a Name if candidate is valid
+        Initializes a Hostname if candidate is valid
         """
         if not isinstance(candidate, str):
             raise exc.NotAStringError
@@ -83,26 +61,6 @@ class Name:
 
         for idx, label in enumerate(self._labels):
             self._validate_label(idx, label)
-
-    @property
-    def dnsname(self) -> dns.name.Name:
-        """Returns a :class:`dns.name.Name`."""
-        return self._dnsname
-
-    @property
-    def flags(self) -> dict[str, bool]:
-        """Returns the flags used when valicating this hostname"""
-        return self._flags
-
-    @property
-    def labels(self) -> list[bytes]:
-        """Returns a list of labels, ordered from leftmost to rightmost.
-
-        Returned list never includes the DNS root label ``""``.
-        If you want the full DNS labels use :func:`dnsname()`
-        and use the :attr:`dns.name.Name.labels` for that list.
-        """
-        return self._labels
 
     def _validate_label(self, index: int, label: bytes) -> bool:
         """For a valid dns label, s, is valid hostname label.
@@ -176,6 +134,26 @@ class Name:
 
         return True
 
+    @property
+    def dnsname(self) -> dns.name.Name:
+        """Returns a :class:`dns.name.Name`."""
+        return self._dnsname
+
+    @property
+    def flags(self) -> dict[str, bool]:
+        """Returns the flags used when valicating this hostname"""
+        return self._flags
+
+    @property
+    def labels(self) -> list[bytes]:
+        """Returns a list of labels, ordered from leftmost to rightmost.
+
+        Returned list never includes the DNS root label ``""``.
+        If you want the full DNS labels use :func:`dnsname()`
+        and use the :attr:`dns.name.Name.labels` for that list.
+        """
+        return self._labels
+
 
 def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Hostname]:
     """retruns True iff candidate is a standards complient Internet hostname.
@@ -190,7 +168,7 @@ def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Hostname]:
     """
 
     try:
-        Name(candidate, **kwargs)
+        Hostname(candidate, **kwargs)
     except exc.HostnameException:
         return False
     return True

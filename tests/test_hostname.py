@@ -132,7 +132,7 @@ class TestName(unittest.TestCase):
                     with self.subTest(msg=f"{desc} {flagset}"):
                         self.assertRaises(
                             exception,
-                            hn.Name,
+                            hn.Hostname,
                             data,
                             **TestName.flagset_to_dict(flagset),
                         )
