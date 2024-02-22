@@ -6,6 +6,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## 0.0.2 - 2024-02-22
+
 ### Added
 
     - py.typed
@@ -15,6 +17,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
     - Removed `name` name space.
+    - Removed `Name` class and combined its functionality with `Hostname` class
 
 ## 0.0.1 - 2024-01-27
 
