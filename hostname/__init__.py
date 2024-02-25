@@ -141,7 +141,7 @@ class Hostname(str):
 
     @property
     def flags(self) -> dict[str, bool]:
-        """Returns the flags used when valicating this hostname"""
+        """Returns the flags used when validating this hostname"""
         return self._flags
 
     @property
@@ -152,6 +152,7 @@ class Hostname(str):
         If you want the full DNS labels use :func:`dnsname()`
         and use the :attr:`dns.name.Name.labels` for that list.
         """
+
         return self._labels
 
 
