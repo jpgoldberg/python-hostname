@@ -81,7 +81,9 @@ Flags
 
 The possible keyword arguments are the booleans, ``allow_idna``, ``allow_underscore``, and ``allow_empty``.
 
-``allow_idna`` Allow non-ASCII hostnames.
+.. _flag-allow_idna:
+
+``allow_idna`` (Allow non-ASCII hostnames)
     When |True|, a hostname candidate hostname like
     ``"szárba.szökik.hu"`` will be accepted.
     When |False| such a candidate will raise an
@@ -98,8 +100,9 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     >>> is_hostname("szarba.szokik.hu", allow_idna=False)
     True
 
+.. _flag-allow_empty:
 
-``allow_empty`` Allow the empty string as a valid hostname.
+``allow_empty`` (Allow the empty string as a valid hostname)
     When |True|, a hostname candidate hostname like
     ``""`` will be accepted.
     When |False| such a candidate will raise an
@@ -113,7 +116,9 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     >>> is_hostname("", allow_empty=True)
     True
 
-``allow_underscore`` Allow underscore in leftmost label.
+.. _flag-allow_underscore:
+
+``allow_underscore`` (Allow underscore in leftmost label)
     When |True|, a hostname candidate hostname like
     ``"under_score.in.host"`` will be accepted.
     When |False| such a candidate will raise an
@@ -150,4 +155,4 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     is just one reason for not being valid.
 
     In case of the class initiations, we want to reserve :py:exc:`TypeError`
-    for bad types of other arguments. When the candidate hostname is not a string, we raise :class:`exceptions.NotAStringError`.
+    for bad types of other arguments. When the candidate hostname is not a string, we raise :class:`hostname.exception.NotAStringError`.
