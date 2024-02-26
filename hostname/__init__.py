@@ -40,11 +40,19 @@ class Hostname(str):
                 raise TypeError(f'"{k}" must be True or False')
             self._flags[k] = v
 
-        if not (candidate.isascii() or self._flags["allow_idna"]):
+        # Ideally, I'd be able to separate initializating from validation,
+        # but I need the dns.Name check before I can create IDNA encoded labels
+        # If I call idna early, i can lose information on why a hostname fails.
+        self._validate_hostname()
+
+    def _validate_hostname(self) -> None:
+        """raises exception if self isn't valid. Also sets _labels"""
+
+        if not (self.isascii() or self._flags["allow_idna"]):
             raise exc.NotASCIIError
 
         try:
-            self._dnsname = dns.name.from_text(candidate)
+            self._dnsname = dns.name.from_text(self)
         except dns.exception.DNSException as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
