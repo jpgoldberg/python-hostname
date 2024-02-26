@@ -35,7 +35,9 @@ class Hostname(str):
         self._flags = self.DEFAULT_FLAGS.copy()
         for k, v in kwargs.items():
             if k not in self.DEFAULT_FLAGS:
-                raise ValueError(f'Unknown option "{k}"')
+                raise TypeError(f'Unknown option "{k}"')
+            if not isinstance(v, bool):
+                raise TypeError(f'"{k}" must be True or False')
             self._flags[k] = v
 
         if not (candidate.isascii() or self._flags["allow_idna"]):
