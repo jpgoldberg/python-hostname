@@ -5,8 +5,6 @@ All exceptions listed here are subclasses of :class:`exception.HostnameException
 
 .. testcode::
 
-    import hostname
-
     e = "No exception so far"
     try:
         hostname.Hostname("a.bad-.example")
@@ -29,8 +27,6 @@ we raise an
 which wraps :doc:`dns:exceptions` from the dns package.
 
 .. testcode::
-
-    import hostname
 
     e = "No exception so far"
     try:

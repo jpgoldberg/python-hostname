@@ -23,7 +23,7 @@ class NotAStringError(HostnameException):
     """Must be a string"""
 
 
-class InvalidCharacter(HostnameException):
+class BadCharacterError(HostnameException):
     """A forbidden character was found in a label"""
 
 

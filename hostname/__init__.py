@@ -45,7 +45,7 @@ class Hostname(str):
 
         try:
             self._dnsname = dns.name.from_text(candidate)
-        except Exception as e:
+        except dns.exception.DNSException as e:
             raise exc.DomainNameException(dns_exception=e) from e
 
         # We need a mutatable list of the labels to deal with root
@@ -132,7 +132,7 @@ class Hostname(str):
                 if c == UNDERSCORE:
                     raise exc.UnderscoreError
                 else:
-                    raise exc.InvalidCharacter
+                    raise exc.BadCharacterError
 
         return True
 

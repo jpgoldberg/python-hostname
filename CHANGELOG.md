@@ -6,6 +6,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Added
+
+### Changed
+
+    - Bad flags or flag values result in `TypeError`
+    - `InvalidCharacter` exception renamed to `BadCharacterError`.
+
+### Documentation
+
+    - Expanded documentation for exception handling.
+
+    - Fixed some doctests hadn't really been testing testing.
+
 ## 0.0.3 - 2024-02-24
 
 ### Added

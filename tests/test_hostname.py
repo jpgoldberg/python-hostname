@@ -78,7 +78,7 @@ class TestName(unittest.TestCase):
         ),
         TVector("3com.net", True, "Initial digit", None),
         TVector(
-            "a.b@d.example", False, "invalid character", exc.InvalidCharacter
+            "a.b@d.example", False, "invalid character", exc.BadCharacterError
         ),
     ]
 

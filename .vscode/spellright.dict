@@ -2,3 +2,5 @@ dnspython
 mypy
 Pydantic
 hname
+doctests
+py
