@@ -2,10 +2,12 @@ name: "Documentation"
 
 on:
     workflow_dispatch:
-    # push:
-    #  branches: [ "main" ]
-    # pull_request:
-    #  branches: [ "main" ]
+    push:
+      branches: [ "main" ]
+      paths: 'docs/**'
+
+    pull_request:
+      branches: [ "main" ]
 
 jobs:
   pages:
