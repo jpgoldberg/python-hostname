@@ -8,6 +8,8 @@ Here is just an overvew to present an idea of what this package provides.
 Motivation
 -----------
 
+Incorrect and inconsistant validation of inputs can lead to security vulnerabilities. Thus there is a need for a way to ensure that a string is a valid hostname before using it as such.
+
 The plethora of StackExchange and other answers to
 "how to parse hostnames in python" were rarely complete or correct.
 I was suprised that there was no standards-based solution already,
@@ -27,11 +29,14 @@ For now, it is important to know that valid hostnames are a proper subset of val
     limited non-standard behavior
     and :doc:`underscore` for the rationale.
 
-The |project| package package provides
+The |project| package provides
 :func:`hostname.is_hostname`
 boolean function, which performs syntactic validation of candidate hostname.
 This validation only on the form of the candidate hostname.
 It does *not* check whether the name exists in the DNS system.
+
+Examples
+---------
 
 .. testcode::
 
@@ -67,7 +72,10 @@ True
 >>> hn.labels
 [b'foo', b'bar', b'example']
 
-Otherwise it will raise an exception, which will contain some information about why validation failed.
+If, however, the candidate hostname is not valid,
+initialization will raise an exception.
+The specific exception will contain
+information about why validation failed.
 The full list of expections is documented in :doc:`exceptions`.
 
 There are also a number of :ref:`sec-flags` for changing the default behavior.

@@ -3,6 +3,9 @@ Exceptions
 
 All exceptions listed here are subclasses of :class:`exception.HostnameException`
 
+Overview and examples
+----------------------
+
 .. testcode::
 
     e = "No exception so far"
@@ -88,19 +91,20 @@ This allows us to use TypeError to check other arguments
 
     Caught TypeError
 
-
-
-
-
-
-
 If a candidate hostname triggers an error from
 `the IDNA package <https://pypi.org/project/idna/>`_,
 we wrap that in
 :class:`hostname.exception.IDNAException`
 
-all :class:`hostname.exception.HostnameException` classes
----------------------------------------------------------------
+.. warning::
+
+    Only one exception will be raised even if the candidate is
+    invalid for multiple reasons.
+    Which of the errors gets reported in such cases is undefined behavior.
+
+
+All :class:`HostnameException` classes
+---------------------------------------
 
 .. automodule:: hostname.exception
     :members:

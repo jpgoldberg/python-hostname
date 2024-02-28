@@ -23,7 +23,22 @@ Issues = "https://github.com/jpgoldberg/python-hostname/issues"
 Documentation = "https://jpgoldberg.github.io/python-hostname/"
 Changelog = "https://github.com/jpgoldberg/python-hostname/blob/main/CHANGELOG.md"
 
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
 
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+
+  "Topic :: Internet",
+  "Topic :: Utilities",
+
+  "Typing :: Typed",
+]
 
 # [tool.hatch]
 # hatchling configuration is in hatch.toml
