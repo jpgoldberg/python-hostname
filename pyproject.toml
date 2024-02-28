@@ -17,12 +17,6 @@ dependencies = [
     "idna",
 ]
 
-[project.urls]
-Source = "https://github.com/jpgoldberg/python-hostname"
-Issues = "https://github.com/jpgoldberg/python-hostname/issues"
-Documentation = "https://jpgoldberg.github.io/python-hostname/"
-Changelog = "https://github.com/jpgoldberg/python-hostname/blob/main/CHANGELOG.md"
-
 classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: MIT License",
@@ -39,6 +33,12 @@ classifiers = [
 
   "Typing :: Typed",
 ]
+
+[project.urls]
+Source = "https://github.com/jpgoldberg/python-hostname"
+Issues = "https://github.com/jpgoldberg/python-hostname/issues"
+Documentation = "https://jpgoldberg.github.io/python-hostname/"
+Changelog = "https://github.com/jpgoldberg/python-hostname/blob/main/CHANGELOG.md"
 
 # [tool.hatch]
 # hatchling configuration is in hatch.toml
