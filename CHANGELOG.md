@@ -12,6 +12,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Documentation
 
+    - TypeGuard clarification
+    - A first shot at the underscore page
+    - Improved cross referencing
+
 ## ## 0.0.4 - 2024-03-26
 
 ### Added

@@ -54,6 +54,20 @@ passes the test is a :class:`hostname.Hostname`.
     name1 = name1.casefold() # creates new str object.
     do_something_with_hostname(name1)  # Fails type checking
 
+Note that the :py:class:`typing.TypeGuard` mechanism only
+affects static type checking.
+To create an instance of the :class:`hostname.Hostname` class initilize a Hostname:
+
+>>> s = 'example.com'
+>>> is_hostname(s)
+True
+>>> isinstance(s, hostname.Hostname)
+False
+>>> t = hostname.Hostname('example.com')
+>>> isinstance(t, hostname.Hostname)
+True
+
+
 
 Hostname class
 --------------
@@ -65,28 +79,27 @@ initializing the class will raise one of the
 :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 ``**kwargs`` are described in :ref:`sec-flags`.
 
-String methods like :py:func:`str.casefold`
+String methods like :py:meth:`str.casefold`
 when applied to a valid Hostname return a string that is not
 guarenteed to be a valid hostname. [#casefold]_
-Such methods are inherited directly from :py:func:`str` and
+Such methods are inherited directly from :py:class:`str` and
 return strings.
-But some string methods, such as :py:func:`str.upper`,
+But some string methods, such as :py:meth:`str.upper`,
 will always return a valid Hostname when applied to a valid hostname.
 
-.. code-block:: python
 
-    def do_something_with_hostname(hostname: hostname.Hostname) -> None:
-        ...
+>>> h1 = hostname.Hostname("www.example")
+>>> isinstance(h1, hostname.Hostname)
+True
 
-    h1 = hostname.Hostname("www.example")
-    do_something_with_hostname(h1)  # Passes type checking
+>>> folded = h1.casefold()  # creates new str object.
+>>> isinstance(folded, hostname.Hostname)
+False
 
-    folded = h1.casefold()  # creates new str object.
-    do_something_with_hostname(folded)  # Fails type checking
 
-    uppered = h1.upper()  # creates a new Hostname
-    do_something_with_hostname(uppered)  # Passes type checking
-
+>>> upperred = h1.upper()  # creates a new Hostname
+>>> isinstance(upperred, hostname.Hostname)
+True
 
 
 .. autoclass:: hostname.Hostname
@@ -177,7 +190,7 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     for bad types of other arguments.
     When the candidate hostname is not a string, we raise :class:`hostname.exception.NotAStringError`.
 
-.. [#casefold] :py:func:`str.casefold` can produce a string that
+.. [#casefold] :py:meth:`str.casefold` can produce a string that
     is longer than what it is applied to. For example
 
     >>> len('straße') < len('straße'.casefold())
