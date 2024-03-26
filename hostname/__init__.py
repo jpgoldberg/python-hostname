@@ -1,4 +1,4 @@
-from typing import Any, TypeGuard, Self
+from typing import Any, TypeGuard
 
 import hostname.exception as exc
 
@@ -21,7 +21,7 @@ class Hostname(str):
         "allow_idna": True,
     }
 
-    def __new__(cls, value: Any, **kwargs: bool) -> Self:
+    def __new__(cls, value: Any, **kwargs: bool) -> "Hostname":
         # explicitly only pass value to the str constructor
         return str.__new__(cls, value)
 
@@ -164,6 +164,27 @@ class Hostname(str):
         """
 
         return self._labels
+
+    @staticmethod
+    def _pre_validated_init(s: str, flags: dict[str, bool]) -> "Hostname":
+        # Changing case does not effect validity as a Hostname,
+        # so we can
+        # 1. Return a Hostbame
+        # 2. Skip validity checks on the new Hostname
+
+        hn = Hostname.__new__(Hostname, s)
+        hn._flags = flags.copy()
+        return hn
+
+    def lower(self) -> "Hostname":
+        """Returns a lower case copy of the Hostname."""
+
+        return Hostname._pre_validated_init(str(self).lower(), self._flags)
+
+    def upper(self) -> "Hostname":
+        """Returns a upper case copy of the Hostname."""
+
+        return Hostname._pre_validated_init(str(self).upper(), self._flags)
 
 
 def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Hostname]:
