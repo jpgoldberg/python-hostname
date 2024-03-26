@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "hostname"
 description = "A syntactic validator for Internet hostnames"
 dynamic = ["version"]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 authors = [
     {name = "Jeffrey Goldberg", email = "jeffrey@goldmark.org"}
 ]
@@ -22,6 +22,7 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
 
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 

@@ -65,9 +65,9 @@ initializing the class will raise one of the
 :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 ``**kwargs`` are described in :ref:`sec-flags`.
 
-String methods like :py:func:`str.lstrip`
+String methods like :py:func:`str.casefold`
 when applied to a valid Hostname return a string that is not
-guarenteed to be a valid hostname.
+guarenteed to be a valid hostname. [#casefold]_
 Such methods are inherited directly from :py:func:`str` and
 return strings.
 But some string methods, such as :py:func:`str.upper`,
@@ -167,10 +167,21 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
 
 .. rubric:: Footnotes
 
-.. [#TypeError] In the case of :func:`hostname.is_hostname`, we want the
-    function to accept any input, but return |False| for all instances of the
-    candidate not being a valid hostname. Not being a string
-    is just one reason for not being valid.
+.. [#TypeError] In the case of :func:`hostname.is_hostname`,
+    we want the function to accept any input,
+    but return |False| for all instances of the
+    candidate not being a valid hostname.
+    Not being a string is just one reason for not being valid.
 
     In case of the class initiations, we want to reserve :py:exc:`TypeError`
-    for bad types of other arguments. When the candidate hostname is not a string, we raise :class:`hostname.exception.NotAStringError`.
+    for bad types of other arguments.
+    When the candidate hostname is not a string, we raise :class:`hostname.exception.NotAStringError`.
+
+.. [#casefold] :py:func:`str.casefold` can produce a string that
+    is longer than what it is applied to. For example
+
+    >>> len('straße') < len('straße'.casefold())
+    True
+
+    As there are length limits on valid hostnames and components of hostnames, we can't guarentee that :func:`casefold` preserves
+    hostnameness.

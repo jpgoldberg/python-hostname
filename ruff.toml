@@ -1,14 +1,6 @@
 target-version = "py311"
 line-length = 79
-unfixable = [
-  # Don't touch unused imports
-  "F401",
-  # Avoid trying to fix flake8-bugbear (`B`) violations
-  "B",
-]
 
-[flake8-tidy-imports]
-ban-relative-imports = "all"
 
 [lint]
 # Enable flake8-bugbear (`B`) rules, in addition to the defaults.
@@ -20,6 +12,20 @@ ignore = ["E501"]
 # Only ignore variables named "_".
 dummy-variable-rgx = "^_$"
 
+unfixable = [
+  # Don't touch unused imports
+  "F401",
+  # Avoid trying to fix flake8-bugbear (`B`) violations
+  "B",
+]
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[lint.isort]
+known-first-party = ["hostname"]
+
+
 
 # Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
 [lint.per-file-ignores]
@@ -27,6 +33,3 @@ dummy-variable-rgx = "^_$"
 "**/{tests,docs,tools}/*" = ["E402"]
 # Tests can use magic values, assertions, and relative imports
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
-
-[isort]
-known-first-party = ["hostname"]

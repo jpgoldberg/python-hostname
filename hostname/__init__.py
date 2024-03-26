@@ -187,12 +187,12 @@ class Hostname(str):
         return Hostname._pre_validated_init(str(self).upper(), self._flags)
 
     def title(self) -> "Hostname":
-        """Returns a lower case copy of the Hostname."""
+        """Returns a title case copy of the Hostname."""
 
         return Hostname._pre_validated_init(str(self).title(), self._flags)
 
     def capitalize(self) -> "Hostname":
-        """Returns a upper case copy of the Hostname."""
+        """Returns a capitizezed copy of the Hostname."""
 
         return Hostname._pre_validated_init(
             str(self).capitalize(), self._flags

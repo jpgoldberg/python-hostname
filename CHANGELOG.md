@@ -10,10 +10,27 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+### Documentation
+
+## ## 0.0.4 - 2024-03-26
+
+### Added
+
+    - Hostname methods
+      `upper()`, `lower()`, `title()`, and `capitalize()`,
+      which preserve hostnameness.
+
+### Changed
+
     - Bad flags or flag values result in `TypeError`
     - `InvalidCharacter` exception renamed to `BadCharacterError`.
+    - Removed misuse of `Self`
+    - Minimum python version is 3.10 instead of 3.11.
+    - Addressed `ruff.toml` deprecations.
 
 ### Documentation
+
+    - Improved type checking examples
 
     - Expanded documentation for exception handling.
 
