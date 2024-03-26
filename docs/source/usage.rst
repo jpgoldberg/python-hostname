@@ -36,7 +36,6 @@ allowing type checkers to know that any object which
 passes the test is a :class:`hostname.Hostname`.
 
 
-
 .. code-block:: python
 
     import hostname
@@ -50,19 +49,14 @@ passes the test is a :class:`hostname.Hostname`.
 
     if not hostname.is_hostname(name1):
         raise TypeError('Expected valid Hostname')
-
     do_something_with_hostname(name1)  # Passes type checking
 
-    name1 = name1.upper() # creates new str object.
-
+    name1 = name1.casefold() # creates new str object.
     do_something_with_hostname(name1)  # Fails type checking
 
 
-Classes
--------
-
-Hostname
-^^^^^^^^
+Hostname class
+--------------
 
 The :class:`hostname.Hostname` is a subtype of :py:class:`str`.
 
@@ -70,6 +64,30 @@ If ``candidate`` is not a valid hostname,
 initializing the class will raise one of the
 :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 ``**kwargs`` are described in :ref:`sec-flags`.
+
+String methods like :py:func:`str.lstrip`
+when applied to a valid Hostname return a string that is not
+guarenteed to be a valid hostname.
+Such methods are inherited directly from :py:func:`str` and
+return strings.
+But some string methods, such as :py:func:`str.upper`,
+will always return a valid Hostname when applied to a valid hostname.
+
+.. code-block:: python
+
+    def do_something_with_hostname(hostname: hostname.Hostname) -> None:
+        ...
+
+    h1 = hostname.Hostname("www.example")
+    do_something_with_hostname(h1)  # Passes type checking
+
+    folded = h1.casefold()  # creates new str object.
+    do_something_with_hostname(folded)  # Fails type checking
+
+    uppered = h1.upper()  # creates a new Hostname
+    do_something_with_hostname(uppered)  # Passes type checking
+
+
 
 .. autoclass:: hostname.Hostname
     :members:
