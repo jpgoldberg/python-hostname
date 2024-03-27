@@ -165,39 +165,6 @@ class Hostname(str):
 
         return self._labels
 
-    @staticmethod
-    def _pre_validated_init(s: str, flags: dict[str, bool]) -> "Hostname":
-        # Changing case does not effect validity as a Hostname,
-        # so we can
-        # 1. Return a Hostbame
-        # 2. Skip validity checks on the new Hostname
-
-        hn = Hostname.__new__(Hostname, s)
-        hn._flags = flags.copy()
-        return hn
-
-    def lower(self) -> "Hostname":
-        """Returns a lower case copy of the Hostname."""
-
-        return Hostname._pre_validated_init(str(self).lower(), self._flags)
-
-    def upper(self) -> "Hostname":
-        """Returns a upper case copy of the Hostname."""
-
-        return Hostname._pre_validated_init(str(self).upper(), self._flags)
-
-    def title(self) -> "Hostname":
-        """Returns a title case copy of the Hostname."""
-
-        return Hostname._pre_validated_init(str(self).title(), self._flags)
-
-    def capitalize(self) -> "Hostname":
-        """Returns a capitizezed copy of the Hostname."""
-
-        return Hostname._pre_validated_init(
-            str(self).capitalize(), self._flags
-        )
-
 
 def is_hostname(candidate: Any, **kwargs: bool) -> TypeGuard[Hostname]:
     """retruns True iff candidate is a standards complient Internet hostname.

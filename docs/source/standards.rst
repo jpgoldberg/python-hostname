@@ -79,6 +79,8 @@ This allowed hostnames such as `3Com.net`. [#3]_
 Internationalization
 ---------------------
 
+Internationalized hostnames add a number of complications.
+
 .. note::
     This section is not written yet.
 

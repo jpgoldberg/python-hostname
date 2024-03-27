@@ -51,7 +51,7 @@ passes the test is a :class:`hostname.Hostname`.
         raise TypeError('Expected valid Hostname')
     do_something_with_hostname(name1)  # Passes type checking
 
-    name1 = name1.casefold() # creates new str object.
+    name1 = name1.upper() # creates new str object.
     do_something_with_hostname(name1)  # Fails type checking
 
 Note that the :py:class:`typing.TypeGuard` mechanism only
@@ -67,6 +67,15 @@ False
 >>> isinstance(t, hostname.Hostname)
 True
 
+.. note::
+
+    Although underlyingly hostnames are case insensitive
+    that does not hold for internationalized hostnames.
+    Althouh both valid, ``straße.example`` is not equivalent to
+    ``STRASSE.EXAMPLE``.
+
+    >>> 'straße.example'.upper()
+    'STRASSE.EXAMPLE'
 
 
 Hostname class
@@ -79,31 +88,20 @@ initializing the class will raise one of the
 :exc:`hostname.exception.HostnameException` :doc:`exceptions`.
 ``**kwargs`` are described in :ref:`sec-flags`.
 
-String methods like :py:meth:`str.casefold`
-when applied to a valid Hostname return a string that is not
-guarenteed to be a valid hostname. [#casefold]_
-Such methods are inherited directly from :py:class:`str` and
-return strings.
-But some string methods, such as :py:meth:`str.upper`,
-will always return a valid Hostname when applied to a valid hostname.
-
-
->>> h1 = hostname.Hostname("www.example")
->>> isinstance(h1, hostname.Hostname)
-True
-
->>> folded = h1.casefold()  # creates new str object.
->>> isinstance(folded, hostname.Hostname)
-False
-
-
->>> upperred = h1.upper()  # creates a new Hostname
->>> isinstance(upperred, hostname.Hostname)
-True
-
 
 .. autoclass:: hostname.Hostname
     :members:
+
+Because :class:`~hostname.Hostname` is a subclass of :py:class:`str`,
+all ``str`` methods are available.
+But it is important to note that what is returned by those inherited methods is not a :class:`hostname.Hostname`.
+
+>>> h = hostname.Hostname('foo.example')
+>>> isinstance(h, hostname.Hostname)
+True
+>>> isinstance(h.upper(), hostname.Hostname)
+False
+
 
 .. _sec-flags:
 
@@ -189,12 +187,3 @@ The possible keyword arguments are the booleans, ``allow_idna``, ``allow_undersc
     In case of the class initiations, we want to reserve :py:exc:`TypeError`
     for bad types of other arguments.
     When the candidate hostname is not a string, we raise :class:`hostname.exception.NotAStringError`.
-
-.. [#casefold] :py:meth:`str.casefold` can produce a string that
-    is longer than what it is applied to. For example
-
-    >>> len('straße') < len('straße'.casefold())
-    True
-
-    As there are length limits on valid hostnames and components of hostnames, we can't guarentee that :func:`casefold` preserves
-    hostnameness.

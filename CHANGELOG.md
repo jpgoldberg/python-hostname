@@ -10,11 +10,15 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+    - Reverted the  `upper()`, `lower()`, `title()`, and `capitalize()`
+      methods, which do _not_ preserve hostnameness.
+
 ### Documentation
 
     - TypeGuard clarification
-    - A first shot at the underscore page
+    - A first shot at the underscore rant
     - Improved cross referencing
+    - Redone README
 
 ## ## 0.0.4 - 2024-03-26
 
