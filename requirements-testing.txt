@@ -1,5 +1,5 @@
-# type checking requires powerset-generator
-# Used in .github/workflows/lint.yml
-
+# Testing requires  powerset-generator
+# Used in .github/workflows/test.yml
 -r requirements.txt
+pytest
 powerset-generator >= 0.1.1
